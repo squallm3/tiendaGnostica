@@ -1,0 +1,14 @@
+services:
+  haikusgnosticos:
+    build: .
+    container_name: haikusgnosticos
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      - NODE_ENV=production
+
+    volumes:
+      - ./public:/app/public

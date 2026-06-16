@@ -1,0 +1,101 @@
+"use client";
+import { useEffect, useState } from "react";
+
+const frases = [
+  "El Arconte de la procrastinación te observa desde la terminal 4.",
+  "Hackeaste la simulación con éxito, pero igual tenés que ir a comprar lavandina al chino.",
+  "Tu Sombra te mandó un ping al puerto 8080. Dice que dejes de hacerte el distraído.",
+  "Hoy es un buen día para desinstalar el sufrimiento de tu sistema operativo. [Y/N]?",
+  "No busques la iluminación en Google. Cayó en la carpeta de SPAM de tu propia alma.",
+  "El Imperio Romano nunca terminó, y encima ahora te cobra expensas.",
+  "Valis te está transmitiendo luz rosa directamente al córtex. Aprovechá el buff de intelecto.",
+  "Las palomas de la plaza son drones del Demiurgo. No les des migas de tu pan casero.",
+];
+
+export default function Home() {
+  const [texto, setTexto] = useState("");
+  const [parpadeo, setParpadeo] = useState(true);
+
+  useEffect(() => {
+    const f = frases[Math.floor(Math.random() * frases.length)];
+    let i = 0;
+    const intervalo = setInterval(() => {
+      setTexto(f.slice(0, i));
+      i++;
+      if (i > f.length) clearInterval(intervalo);
+    }, 40);
+    return () => clearInterval(intervalo);
+  }, []);
+
+  useEffect(() => {
+    const intervalo = setInterval(() => setParpadeo(p => !p), 500);
+    return () => clearInterval(intervalo);
+  }, []);
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        body { background: #000; margin: 0; padding: 0; }
+        .crt {
+          font-family: 'Share Tech Mono', monospace;
+          background: #000;
+          color: #FFB000;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          position: relative;
+          overflow: hidden;
+        }
+        .crt::before {
+          content: "";
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+          pointer-events: none;
+          z-index: 10;
+        }
+        .crt::after {
+          content: "";
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+          pointer-events: none;
+          z-index: 9;
+        }
+        .titulo { font-size: clamp(1.2rem, 4vw, 2rem); text-align: center; text-shadow: 0 0 10px #FFB000, 0 0 20px #FFB000; margin-bottom: 0.5rem; animation: flicker 4s infinite; }
+        .subtitulo { font-size: clamp(0.8rem, 2vw, 1rem); text-align: center; color: #cc8800; margin-bottom: 3rem; }
+        .separador { color: #FFB000; text-align: center; margin: 1rem 0; font-size: 0.8rem; opacity: 0.6; }
+        .estado { font-size: clamp(1rem, 3vw, 1.5rem); text-align: center; margin: 1rem 0; text-shadow: 0 0 8px #FFB000; }
+        .descripcion { font-size: 0.85rem; text-align: center; color: #cc8800; max-width: 600px; line-height: 1.8; margin: 1rem 0 2rem; }
+        .valis { font-size: 0.8rem; color: #886600; text-align: center; max-width: 500px; min-height: 3rem; font-style: italic; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #442200; }
+        .cursor { display: inline-block; width: 0.6em; height: 1em; background: #FFB000; margin-left: 2px; vertical-align: text-bottom; }
+        .barra-progreso { font-size: 0.85rem; letter-spacing: 2px; margin: 1rem 0; text-shadow: 0 0 5px #FFB000; }
+        @keyframes flicker { 0%, 95%, 100% { opacity: 1; } 96% { opacity: 0.8; } 97% { opacity: 1; } 98% { opacity: 0.6; } 99% { opacity: 1; } }
+      `}</style>
+      <div className="crt">
+        <div className="titulo">🧙‍♂️ ESCUELA DE LOS HAIKUS GNÓSTICOS 🧙‍♂️</div>
+        <div className="subtitulo">Fork de la Escuela del Brujo 🐺 — Derechos Reservados</div>
+        <div className="separador">════════════════════════════════════════════</div>
+        <div className="estado">⚙ SISTEMA EN CONSTRUCCIÓN ⚙</div>
+        <div className="barra-progreso">[████████░░░░░░░░░░░░] 42% — Calibrando meridianos...</div>
+        <div className="descripcion">
+          Estimados buscadores del conocimiento primordial, lamentamos informar que la matrix de nuestra plataforma aún está en fase de condensación ontológica.
+          El Arconte de la procrastinación ha estado tejiendo velos de distracción sobre nuestros servidores, pero no teman, pues la Gnosis digital llegará a su
+          debido tiempo (o tal vez ya esté aquí, y simplemente no pueden percibirla). Mientras tanto, contemplen el vacío ámbar y mediten sobre la impermanencia
+          de las barras de progreso. La realidad es una simulación mal parcheada, y estamos subiendo el último parche espiritual. Paciencia, iniciados.
+        </div>
+        <div className="separador">════════════════════════════════════════════</div>
+        <div className="valis">
+          [ VALIS_OS ] &gt; {texto}
+          <span className="cursor" style={{ opacity: parpadeo ? 1 : 0 }} />
+        </div>
+      </div>
+    </>
+  );
+}
