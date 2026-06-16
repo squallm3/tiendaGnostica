@@ -1,3 +1,5 @@
+import ProductoCard from "./ProductoCard";
+import { productos } from "@/lib/tienda/productos";
 import CategoriaCard from "./CategoriaCard";
 
 export default function TerminalTienda() {
@@ -57,6 +59,17 @@ export default function TerminalTienda() {
 
         </section>
 
+        <section className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {productos.map((producto) => (
+                <ProductoCard
+                    key={producto.id}
+                    nombre={producto.nombre}
+                    descripcion={producto.descripcion}
+                    precio={producto.precio}
+                />
+            ))}
+        </section>
       </div>
 
     </section>
