@@ -1,6 +1,34 @@
 import Image from "next/image";
 
 export default function ShellTienda() {
+  const categorias = [
+    {
+      nombre: "Remeras",
+      imagen: "/tienda/iconos/remera.png",
+    },
+    {
+      nombre: "Hoodies",
+      imagen: "/tienda/iconos/hoodie.png",
+    },
+    {
+      nombre: "Joggings",
+      imagen: "/tienda/iconos/joggings.png",
+    },
+    {
+      nombre: "Libros",
+      imagen: "/tienda/iconos/libro.png",
+    },
+    {
+      nombre: "Accesorios",
+      imagen: "/tienda/iconos/accesorios.png",
+    },
+    {
+      nombre: "Artefactos",
+      imagen: "/tienda/iconos/medallon.png",
+    },
+  ];
+
+
   return (
     <main
       className="
@@ -24,7 +52,6 @@ export default function ShellTienda() {
         "
       >
 
-        {/* PLAYER */}
 
         <div
           className="
@@ -44,6 +71,7 @@ export default function ShellTienda() {
         </div>
 
 
+
         <div
           className="
             w-full
@@ -59,8 +87,6 @@ export default function ShellTienda() {
         >
 
 
-          {/* IDENTIDAD */}
-
           <div
             className="
               flex
@@ -71,16 +97,12 @@ export default function ShellTienda() {
             "
           >
 
-            <div className="mb-8">
-
-              <Image
-                src="/tienda/iconos/zorro.png"
-                alt="Logo"
-                width={220}
-                height={220}
-              />
-
-            </div>
+            <Image
+              src="/tienda/iconos/zorro.png"
+              alt="Logo"
+              width={220}
+              height={220}
+            />
 
 
             <h1
@@ -89,38 +111,21 @@ export default function ShellTienda() {
                 font-bold
                 leading-tight
                 text-purple-100
+                mt-8
               "
             >
-
               Tienda de los
               <br />
               Haikus Gnósticos
-
             </h1>
 
 
-            <p
-              className="
-                mt-8
-                text-2xl
-                text-purple-300
-              "
-            >
-
+            <p className="mt-8 text-2xl text-purple-300">
               Sistema Operativo de la Gnosis
-
             </p>
 
 
-
-            <div
-              className="
-                flex
-                items-center
-                gap-5
-                mt-10
-              "
-            >
+            <div className="flex items-center gap-5 mt-10">
 
               <div className="h-px w-32 bg-purple-500" />
 
@@ -133,25 +138,14 @@ export default function ShellTienda() {
             </div>
 
 
-
-            <p
-              className="
-                mt-10
-                text-xl
-                text-purple-300
-              "
-            >
-
+            <p className="mt-10 text-xl text-purple-300">
               Explorá el mercado de la Escuela
-
             </p>
 
 
           </div>
 
 
-
-          {/* CATEGORIAS */}
 
           <div
             className="
@@ -161,36 +155,34 @@ export default function ShellTienda() {
             "
           >
 
-
-            {[
-              ["👕", "Remeras"],
-              ["🧥", "Hoodies"],
-              ["👖", "Joggings"],
-              ["📖", "Libros"],
-              ["☕", "Accesorios"],
-              ["🔮", "Artefactos"],
-            ].map(([icon, title]) => (
+            {categorias.map((categoria) => (
 
               <button
-                key={title}
+                key={categoria.nombre}
                 className="
                   rounded-2xl
                   border
                   border-purple-400
                   bg-black/40
-                  p-8
+                  p-6
                   text-purple-200
                   hover:bg-purple-900/40
                 "
               >
 
-                <div className="text-5xl">
-                  {icon}
-                </div>
+                <Image
+                  src={categoria.imagen}
+                  alt={categoria.nombre}
+                  width={150}
+                  height={150}
+                  className="mx-auto object-contain"
+                />
+
 
                 <div className="mt-4 text-xl font-bold">
-                  {title}
+                  {categoria.nombre}
                 </div>
+
 
               </button>
 
