@@ -1,5 +1,5 @@
-import TerminalTienda from "@/components/tienda/TerminalTienda";
+import ShellTienda from "@/components/tienda/ShellTienda";
 
 export default function Home() {
-  return <TerminalTienda />;
+  return <ShellTienda />;
 }
