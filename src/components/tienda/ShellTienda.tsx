@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 export default function ShellTienda() {
+
   const categorias = [
     {
       nombre: "Remeras",
@@ -30,6 +31,7 @@ export default function ShellTienda() {
 
 
   return (
+
     <main
       className="
         min-h-screen
@@ -49,6 +51,9 @@ export default function ShellTienda() {
           bg-black/40
           p-8
           relative
+          flex
+          items-center
+          justify-center
         "
       >
 
@@ -75,25 +80,27 @@ export default function ShellTienda() {
         <div
           className="
             w-full
-            max-w-6xl
-            mx-auto
-            min-h-screen
+            max-w-7xl
             grid
             grid-cols-1
-            lg:grid-cols-2
-            gap-10
+            lg:grid-cols-[1fr_1.2fr]
+            gap-16
             items-center
           "
         >
 
+
+
+          {/* BLOQUE IDENTIDAD */}
 
           <div
             className="
               flex
               flex-col
               items-center
+              justify-center
               text-center
-              p-10
+              p-8
             "
           >
 
@@ -107,29 +114,38 @@ export default function ShellTienda() {
 
             <h1
               className="
+                mt-8
                 text-5xl
                 font-bold
-                leading-tight
                 text-purple-100
-                mt-8
+                leading-tight
               "
             >
+
               Tienda de los
               <br />
               Haikus Gnósticos
+
             </h1>
 
 
-            <p className="mt-8 text-2xl text-purple-300">
+            <p
+              className="
+                mt-8
+                text-2xl
+                text-purple-300
+              "
+            >
               Sistema Operativo de la Gnosis
             </p>
+
 
 
             <div className="flex items-center gap-5 mt-10">
 
               <div className="h-px w-32 bg-purple-500" />
 
-              <div className="text-purple-400 text-2xl">
+              <div className="text-purple-400">
                 ✦
               </div>
 
@@ -138,7 +154,14 @@ export default function ShellTienda() {
             </div>
 
 
-            <p className="mt-10 text-xl text-purple-300">
+
+            <p
+              className="
+                mt-10
+                text-xl
+                text-purple-300
+              "
+            >
               Explorá el mercado de la Escuela
             </p>
 
@@ -147,46 +170,72 @@ export default function ShellTienda() {
 
 
 
+
+          {/* BLOQUE CATEGORIAS */}
+
           <div
             className="
-              grid
-              grid-cols-2
-              gap-5
+              flex
+              justify-center
             "
           >
 
-            {categorias.map((categoria) => (
+            <div
+              className="
+                w-full
+                max-w-3xl
+                grid
+                grid-cols-2
+                md:grid-cols-3
+                gap-6
+              "
+            >
 
-              <button
-                key={categoria.nombre}
-                className="
-                  rounded-2xl
-                  border
-                  border-purple-400
-                  bg-black/40
-                  p-6
-                  text-purple-200
-                  hover:bg-purple-900/40
-                "
-              >
+              {categorias.map((categoria) => (
 
-                <Image
-                  src={categoria.imagen}
-                  alt={categoria.nombre}
-                  width={150}
-                  height={150}
-                  className="mx-auto object-contain"
-                />
+                <button
+                  key={categoria.nombre}
+                  className="
+                    rounded-2xl
+                    border
+                    border-purple-400
+                    bg-black/40
+                    p-6
+                    flex
+                    flex-col
+                    items-center
+                    justify-center
+                    text-purple-200
+                    hover:bg-purple-900/40
+                  "
+                >
+
+                  <Image
+                    src={categoria.imagen}
+                    alt={categoria.nombre}
+                    width={130}
+                    height={130}
+                    className="object-contain"
+                  />
 
 
-                <div className="mt-4 text-xl font-bold">
-                  {categoria.nombre}
-                </div>
+                  <span
+                    className="
+                      mt-4
+                      text-lg
+                      font-bold
+                    "
+                  >
+                    {categoria.nombre}
+                  </span>
 
 
-              </button>
+                </button>
 
-            ))}
+              ))}
+
+
+            </div>
 
 
           </div>
@@ -199,5 +248,6 @@ export default function ShellTienda() {
 
 
     </main>
+
   );
 }
