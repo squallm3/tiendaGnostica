@@ -1,8 +1,9 @@
-import HeaderTienda from "./HeaderTienda";
+import HeaderCategoria from "./HeaderCategoria";
 import MercaderBanner from "./MercaderBanner";
 
 
 export default function CategoriaTienda() {
+
 
   return (
 
@@ -23,7 +24,9 @@ export default function CategoriaTienda() {
       >
 
 
-        <HeaderTienda />
+        <HeaderCategoria
+          titulo="Remeras"
+        />
 
 
 
@@ -39,6 +42,7 @@ export default function CategoriaTienda() {
           />
 
         </div>
+
 
 
       </section>
