@@ -1,3 +1,4 @@
+import HeaderTienda from "./HeaderTienda";
 import MercaderBanner from "./MercaderBanner";
 
 
@@ -20,6 +21,10 @@ export default function CategoriaTienda() {
           mx-auto
         "
       >
+
+
+        <HeaderTienda />
+
 
 
         <div

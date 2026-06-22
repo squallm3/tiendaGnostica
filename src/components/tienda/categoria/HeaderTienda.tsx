@@ -1,29 +1,117 @@
+import Image from "next/image";
+
+
 export default function HeaderTienda() {
+
+
   return (
-    <header className="w-full border border-purple-500/40 rounded-xl p-4 bg-black/60">
 
-      <div className="flex items-center justify-between">
+    <header
+      className="
+        w-full
+        h-24
+        bg-black/80
+        border
+        border-purple-500
+        rounded-xl
+        flex
+        items-center
+        justify-between
+        px-8
+        text-purple-200
+      "
+    >
 
-        <div>
-          <h1 className="text-5xl font-bold text-purple-200">
-            Tienda de Remeras
+
+      {/* MENU CATEGORIAS */}
+
+      <button
+        className="
+          text-4xl
+          text-purple-400
+        "
+      >
+
+        📖
+
+      </button>
+
+
+
+      {/* IDENTIDAD */}
+
+      <div
+        className="
+          flex
+          items-center
+          gap-5
+        "
+      >
+
+        <Image
+          src="/tienda/iconos/zorro.png"
+          alt="Haikus Gnósticos"
+          width={70}
+          height={70}
+        />
+
+
+        <div
+          className="
+            text-center
+          "
+        >
+
+          <h1
+            className="
+              text-3xl
+              font-bold
+              text-purple-100
+            "
+          >
+
+            TIENDA DE HAÍKUS GNÓSTICOS
+
           </h1>
 
-          <p className="text-purple-300 mt-2">
-            Objetos del mundo de Haikus Gnósticos
+
+          <p
+            className="
+              text-sm
+              text-purple-400
+            "
+          >
+
+            Sistema Operativo de la Gnosis
+
           </p>
-        </div>
 
-        <div className="w-16 h-16 rounded-full border border-purple-400 flex items-center justify-center">
-
-          <span className="text-purple-300 text-2xl">
-            🦊
-          </span>
 
         </div>
+
 
       </div>
 
+
+
+
+      {/* CARRITO */}
+
+      <button
+        className="
+          text-3xl
+          text-purple-400
+        "
+      >
+
+        🛒
+
+      </button>
+
+
+
     </header>
+
   );
+
 }
