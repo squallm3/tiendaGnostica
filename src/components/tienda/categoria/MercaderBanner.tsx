@@ -1,58 +1,69 @@
 import Image from "next/image";
 
+
 interface MercaderBannerProps {
+
   titulo?: string;
   imagen: string;
+
 }
 
 
 export default function MercaderBanner({
+
   titulo = "Mercader",
   imagen,
+
 }: MercaderBannerProps) {
+
 
   return (
 
     <section
       className="
         w-full
+
         rounded-2xl
-        border-2
-        border-purple-400
-        shadow-[0_0_30px_rgba(168,85,247,0.5)]
-        bg-black/70
-        overflow-hidden
-        p-6
+
+        border
+        border-purple-400/60
+
+        bg-black/60
+
+        shadow-[0_0_30px_rgba(168,85,247,0.35)]
+
+        p-8
       "
     >
+
 
       <div
         className="
           flex
           flex-col
           items-center
-          justify-center
-          gap-6
+          gap-5
         "
       >
+
 
         <Image
           src={imagen}
           alt={titulo}
-          width={600}
-          height={600}
-          className="
-            object-contain
-          "
+          width={500}
+          height={500}
+          className="object-contain"
         />
+
 
 
         <h2
           className="
-            text-4xl
+            text-3xl
+
             font-bold
+
             text-purple-100
-            text-center
           "
         >
 
@@ -61,7 +72,21 @@ export default function MercaderBanner({
         </h2>
 
 
+
+        <p
+          className="
+            text-purple-300
+            text-lg
+          "
+        >
+
+          Explorá los objetos de la Escuela
+
+        </p>
+
+
       </div>
+
 
     </section>
 

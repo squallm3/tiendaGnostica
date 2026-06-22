@@ -20,10 +20,7 @@ export default function HeaderCategoria({
         w-full
         h-32
 
-        bg-gradient-to-r
-        from-black
-        via-purple-950/40
-        to-black
+        bg-black/80
 
         border
         border-purple-500/70
@@ -42,15 +39,12 @@ export default function HeaderCategoria({
     >
 
 
-      {/* MARCO INTERNO */}
-
       <div
         className="
           absolute
           inset-2
           border
           border-purple-400/30
-          pointer-events-none
         "
       />
 
@@ -58,63 +52,19 @@ export default function HeaderCategoria({
 
       {/* ESQUINAS */}
 
-      <div
-        className="
-          absolute
-          top-0
-          left-0
-          w-12
-          h-12
-          border-t-2
-          border-l-2
-          border-purple-300
-        "
-      />
+      <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-purple-300" />
 
-      <div
-        className="
-          absolute
-          top-0
-          right-0
-          w-12
-          h-12
-          border-t-2
-          border-r-2
-          border-purple-300
-        "
-      />
+      <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-purple-300" />
 
-      <div
-        className="
-          absolute
-          bottom-0
-          left-0
-          w-12
-          h-12
-          border-b-2
-          border-l-2
-          border-purple-300
-        "
-      />
+      <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-purple-300" />
 
-      <div
-        className="
-          absolute
-          bottom-0
-          right-0
-          w-12
-          h-12
-          border-b-2
-          border-r-2
-          border-purple-300
-        "
-      />
+      <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-purple-300" />
 
 
 
 
 
-      {/* LIBRO */}
+      {/* MENU */}
 
       <button
         className="
@@ -148,7 +98,7 @@ export default function HeaderCategoria({
 
 
 
-      {/* TITULO */}
+      {/* IDENTIDAD */}
 
       <div
         className="
@@ -162,9 +112,13 @@ export default function HeaderCategoria({
       >
 
 
-        <span className="text-purple-400 text-xl">
-          ✦
-        </span>
+        <Image
+          src="/tienda/iconos/zorro.png"
+          alt="Haikus Gnósticos"
+          width={70}
+          height={70}
+        />
+
 
 
         <div
@@ -173,49 +127,64 @@ export default function HeaderCategoria({
           "
         >
 
-          <h1
+
+          <div
             className="
-              text-3xl
-              md:text-4xl
-
-              font-bold
-
-              tracking-[0.2em]
-
-              text-purple-100
+              flex
+              items-center
+              justify-center
+              gap-3
             "
           >
 
-            TIENDA DE {titulo.toUpperCase()}
+            <span className="text-purple-400">
+              ✦
+            </span>
 
-          </h1>
+
+
+            <h1
+              className="
+                text-3xl
+                md:text-4xl
+
+                font-bold
+
+                text-purple-100
+              "
+            >
+
+              Tienda de {titulo}
+
+            </h1>
+
+
+
+            <span className="text-purple-400">
+              ✦
+            </span>
+
+
+          </div>
+
 
 
           <p
             className="
               mt-2
 
-              text-xs
-              md:text-sm
+              text-sm
 
-              tracking-[0.3em]
-
-              text-purple-400
+              text-purple-300
             "
           >
 
-            SISTEMA OPERATIVO DE LA GNOSIS
+            Sistema Operativo de la Gnosis
 
           </p>
 
 
         </div>
-
-
-
-        <span className="text-purple-400 text-xl">
-          ✦
-        </span>
 
 
       </div>
@@ -253,7 +222,6 @@ export default function HeaderCategoria({
         />
 
       </button>
-
 
 
     </header>
