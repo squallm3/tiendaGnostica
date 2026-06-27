@@ -3,16 +3,15 @@ import Image from "next/image";
 
 interface MercaderBannerProps {
 
-  titulo?: string;
-  imagen: string;
+  categoria: string;
 
 }
 
 
+
 export default function MercaderBanner({
 
-  titulo = "Mercader",
-  imagen,
+  categoria,
 
 }: MercaderBannerProps) {
 
@@ -21,7 +20,11 @@ export default function MercaderBanner({
 
     <section
       className="
+        relative
+
         w-full
+
+        overflow-hidden
 
         rounded-2xl
 
@@ -31,61 +34,56 @@ export default function MercaderBanner({
         bg-black/60
 
         shadow-[0_0_30px_rgba(168,85,247,0.35)]
-
-        p-8
       "
     >
 
 
-      <div
-        className="
-          flex
-          flex-col
-          items-center
-          gap-5
-        "
-      >
+      <picture>
 
 
-        <Image
-          src={imagen}
-          alt={titulo}
-          width={500}
-          height={500}
-          className="object-contain"
+        {/* DESKTOP */}
+
+        <source
+          media="(min-width: 1024px)"
+          srcSet={`/tienda/escenas/${categoria}_desktop.jpg`}
         />
 
 
 
-        <h2
+        {/* TABLET */}
+
+        <source
+          media="(min-width: 640px)"
+          srcSet={`/tienda/escenas/${categoria}_tablet.jpg`}
+        />
+
+
+
+        {/* MOBILE */}
+
+        <Image
+
+          src={`/tienda/escenas/${categoria}_mobile.jpg`}
+
+          alt={`Escena ${categoria}`}
+
+          width={600}
+
+          height={800}
+
           className="
-            text-3xl
-
-            font-bold
-
-            text-purple-100
+            w-full
+            h-auto
+            object-cover
           "
-        >
 
-          {titulo}
+          priority
 
-        </h2>
-
+        />
 
 
-        <p
-          className="
-            text-purple-300
-            text-lg
-          "
-        >
+      </picture>
 
-          Explorá los objetos de la Escuela
-
-        </p>
-
-
-      </div>
 
 
     </section>

@@ -37,8 +37,7 @@ export default function CategoriaTienda() {
         >
 
           <MercaderBanner
-            titulo="Mercader de Remeras"
-            imagen="/tienda/mercader/remeras.png"
+            categoria="remeras"
           />
 
         </div>
