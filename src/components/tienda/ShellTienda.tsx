@@ -1,38 +1,57 @@
 import Image from "next/image";
+import Link from "next/link";
+
 
 export default function ShellTienda() {
 
+
   const categorias = [
+
     {
       nombre: "Remeras",
+      ruta: "/tienda/remeras",
       imagen: "/tienda/iconos/remera.png",
     },
+
     {
       nombre: "Hoodies",
+      ruta: "/tienda/hoodies",
       imagen: "/tienda/iconos/hoodie.png",
     },
+
     {
       nombre: "Joggings",
+      ruta: "/tienda/joggings",
       imagen: "/tienda/iconos/joggings.png",
     },
+
     {
       nombre: "Libros",
+      ruta: "/tienda/libros",
       imagen: "/tienda/iconos/libro.png",
     },
+
     {
       nombre: "Accesorios",
+      ruta: "/tienda/accesorios",
       imagen: "/tienda/iconos/accesorios.png",
     },
+
     {
       nombre: "Artefactos",
+      ruta: "/tienda/artefactos",
       imagen: "/tienda/iconos/medallon.png",
     },
+
   ];
+
 
 
   return (
 
+
     <main
+
       className="
         min-h-screen
         bg-cover
@@ -40,12 +59,19 @@ export default function ShellTienda() {
         bg-no-repeat
         text-white
       "
+
       style={{
+
         backgroundImage: "url('/tienda/wallpaper-desktop.png')",
+
       }}
+
     >
 
+
+
       <section
+
         className="
           min-h-screen
           bg-black/40
@@ -55,29 +81,43 @@ export default function ShellTienda() {
           items-center
           justify-center
         "
+
       >
 
 
+
+
         <div
+
           className="
             absolute
             top-6
             right-6
           "
+
         >
 
           <Image
+
             src="/tienda/player-icon/20pers.png"
+
             alt="Jugador"
+
             width={60}
+
             height={60}
+
           />
+
 
         </div>
 
 
 
+
+
         <div
+
           className="
             w-full
             max-w-7xl
@@ -87,13 +127,18 @@ export default function ShellTienda() {
             gap-16
             items-center
           "
+
         >
 
 
 
-          {/* BLOQUE IDENTIDAD */}
+
+
+          {/* IDENTIDAD */}
+
 
           <div
+
             className="
               flex
               flex-col
@@ -102,17 +147,27 @@ export default function ShellTienda() {
               text-center
               p-8
             "
+
           >
 
+
             <Image
+
               src="/tienda/iconos/zorro.png"
+
               alt="Logo"
+
               width={220}
+
               height={220}
+
             />
 
 
+
+
             <h1
+
               className="
                 mt-8
                 text-5xl
@@ -120,49 +175,78 @@ export default function ShellTienda() {
                 text-purple-100
                 leading-tight
               "
+
             >
 
               Tienda de los
+
               <br />
+
               Haikus Gnósticos
+
 
             </h1>
 
 
+
+
+
             <p
+
               className="
                 mt-8
                 text-2xl
                 text-purple-300
               "
+
             >
+
               Sistema Operativo de la Gnosis
+
+
             </p>
+
+
+
 
 
 
             <div className="flex items-center gap-5 mt-10">
 
+
               <div className="h-px w-32 bg-purple-500" />
+
 
               <div className="text-purple-400">
+
                 ✦
+
               </div>
 
+
+
               <div className="h-px w-32 bg-purple-500" />
+
 
             </div>
 
 
 
+
+
             <p
+
               className="
                 mt-10
                 text-xl
                 text-purple-300
               "
+
             >
+
               Explorá el mercado de la Escuela
+
+
             </p>
 
 
@@ -171,16 +255,26 @@ export default function ShellTienda() {
 
 
 
-          {/* BLOQUE CATEGORIAS */}
+
+
+
+          {/* CATEGORIAS */}
+
+
 
           <div
+
             className="
               flex
               justify-center
             "
+
           >
 
+
+
             <div
+
               className="
                 w-full
                 max-w-3xl
@@ -189,12 +283,20 @@ export default function ShellTienda() {
                 md:grid-cols-3
                 gap-6
               "
+
             >
+
+
 
               {categorias.map((categoria) => (
 
-                <button
+
+                <Link
+
                   key={categoria.nombre}
+
+                  href={categoria.ruta}
+
                   className="
                     rounded-2xl
                     border
@@ -207,32 +309,53 @@ export default function ShellTienda() {
                     justify-center
                     text-purple-200
                     hover:bg-purple-900/40
+                    transition
                   "
+
                 >
 
+
+
                   <Image
+
                     src={categoria.imagen}
+
                     alt={categoria.nombre}
+
                     width={130}
+
                     height={130}
+
                     className="object-contain"
+
                   />
 
 
+
+
                   <span
+
                     className="
                       mt-4
                       text-lg
                       font-bold
                     "
+
                   >
+
                     {categoria.nombre}
+
+
                   </span>
 
 
-                </button>
+
+                </Link>
+
+
 
               ))}
+
 
 
             </div>
@@ -241,13 +364,19 @@ export default function ShellTienda() {
           </div>
 
 
+
+
         </div>
+
 
 
       </section>
 
 
+
     </main>
 
+
   );
+
 }
