@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorTheme": "Red",
+		"workbench.iconTheme": "material-icon-theme"
+	}
+}
