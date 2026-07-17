@@ -1,57 +1,42 @@
 import Image from "next/image";
 import Link from "next/link";
 
-
 export default function ShellTienda() {
-
-
   const categorias = [
-
     {
       nombre: "Remeras",
-      ruta: "/tienda/remeras",
+      ruta: "/tienda/categorias/remeras",
       imagen: "/tienda/iconos/remera.png",
     },
-
     {
       nombre: "Hoodies",
-      ruta: "/tienda/hoodies",
+      ruta: "/tienda/categorias/hoodies",
       imagen: "/tienda/iconos/hoodie.png",
     },
-
     {
       nombre: "Joggings",
-      ruta: "/tienda/joggings",
+      ruta: "/tienda/categorias/joggings",
       imagen: "/tienda/iconos/joggings.png",
     },
-
     {
       nombre: "Libros",
-      ruta: "/tienda/libros",
+      ruta: "/tienda/categorias/libros",
       imagen: "/tienda/iconos/libro.png",
     },
-
     {
       nombre: "Accesorios",
-      ruta: "/tienda/accesorios",
+      ruta: "/tienda/categorias/accesorios",
       imagen: "/tienda/iconos/accesorios.png",
     },
-
     {
       nombre: "Artefactos",
-      ruta: "/tienda/artefactos",
+      ruta: "/tienda/categorias/artefactos",
       imagen: "/tienda/iconos/medallon.png",
     },
-
   ];
 
-
-
   return (
-
-
     <main
-
       className="
         min-h-screen
         bg-cover
@@ -59,86 +44,48 @@ export default function ShellTienda() {
         bg-no-repeat
         text-white
       "
-
       style={{
-
         backgroundImage: "url('/tienda/wallpaper-desktop.png')",
-
       }}
-
     >
-
-
-
       <section
-
         className="
-          min-h-screen
           bg-black/40
           p-8
-          relative
-          flex
-          items-center
-          justify-center
         "
-
       >
-
-
-
-
         <div
-
           className="
             absolute
             top-6
             right-6
           "
-
         >
-
           <Image
-
             src="/tienda/player-icon/20pers.png"
-
             alt="Jugador"
-
             width={60}
-
             height={60}
-
           />
-
-
         </div>
 
-
-
-
+        {/* HERO + CATEGORIAS */}
 
         <div
-
           className="
-            w-full
             max-w-7xl
+            mx-auto
             grid
             grid-cols-1
             lg:grid-cols-[1fr_1.2fr]
             gap-16
             items-center
+            min-h-screen
           "
-
         >
-
-
-
-
-
           {/* IDENTIDAD */}
 
-
           <div
-
             className="
               flex
               flex-col
@@ -147,27 +94,15 @@ export default function ShellTienda() {
               text-center
               p-8
             "
-
           >
-
-
             <Image
-
               src="/tienda/iconos/zorro.png"
-
               alt="Logo"
-
               width={220}
-
               height={220}
-
             />
 
-
-
-
             <h1
-
               className="
                 mt-8
                 text-5xl
@@ -175,106 +110,43 @@ export default function ShellTienda() {
                 text-purple-100
                 leading-tight
               "
-
             >
-
               Tienda de los
-
               <br />
-
               Haikus Gnósticos
-
-
             </h1>
 
-
-
-
-
             <p
-
               className="
                 mt-8
                 text-2xl
                 text-purple-300
               "
-
             >
-
               Sistema Operativo de la Gnosis
-
-
             </p>
 
-
-
-
-
-
             <div className="flex items-center gap-5 mt-10">
-
-
               <div className="h-px w-32 bg-purple-500" />
-
-
-              <div className="text-purple-400">
-
-                ✦
-
-              </div>
-
-
-
+              <div className="text-purple-400">✦</div>
               <div className="h-px w-32 bg-purple-500" />
-
-
             </div>
 
-
-
-
-
             <p
-
               className="
                 mt-10
                 text-xl
                 text-purple-300
               "
-
             >
-
               Explorá el mercado de la Escuela
-
-
             </p>
-
-
           </div>
-
-
-
-
-
-
 
           {/* CATEGORIAS */}
 
-
-
-          <div
-
-            className="
-              flex
-              justify-center
-            "
-
-          >
-
-
-
+          <div className="flex justify-center">
             <div
-
               className="
                 w-full
                 max-w-3xl
@@ -283,20 +155,11 @@ export default function ShellTienda() {
                 md:grid-cols-3
                 gap-6
               "
-
             >
-
-
-
               {categorias.map((categoria) => (
-
-
                 <Link
-
                   key={categoria.nombre}
-
                   href={categoria.ruta}
-
                   className="
                     rounded-2xl
                     border
@@ -311,72 +174,64 @@ export default function ShellTienda() {
                     hover:bg-purple-900/40
                     transition
                   "
-
                 >
-
-
-
                   <Image
-
                     src={categoria.imagen}
-
                     alt={categoria.nombre}
-
                     width={130}
-
                     height={130}
-
                     className="object-contain"
-
                   />
 
-
-
-
                   <span
-
                     className="
                       mt-4
                       text-lg
                       font-bold
                     "
-
                   >
-
                     {categoria.nombre}
-
-
                   </span>
-
-
-
                 </Link>
-
-
-
               ))}
-
-
-
             </div>
-
-
           </div>
-
-
-
-
         </div>
 
+        {/* PRODUCTOS DESTACADOS */}
 
+        <section
+          className="
+            max-w-7xl
+            mx-auto
+            mt-24
+          "
+        >
+          <h2
+            className="
+              text-4xl
+              font-bold
+              text-center
+              text-purple-200
+            "
+          >
+            Productos Destacados
+          </h2>
 
+          <div
+            className="
+              mt-10
+              grid
+              grid-cols-1
+              md:grid-cols-2
+              xl:grid-cols-4
+              gap-8
+            "
+          >
+            {/* Próximamente irán ProductoCard */}
+          </div>
+        </section>
       </section>
-
-
-
     </main>
-
-
   );
-
 }
