@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import ProductosDestacados from "@/components/tienda/home/ProductosDestacados";
+
 export default function ShellTienda() {
   const categorias = [
     {
@@ -200,37 +202,8 @@ export default function ShellTienda() {
 
         {/* PRODUCTOS DESTACADOS */}
 
-        <section
-          className="
-            max-w-7xl
-            mx-auto
-            mt-24
-          "
-        >
-          <h2
-            className="
-              text-4xl
-              font-bold
-              text-center
-              text-purple-200
-            "
-          >
-            Productos Destacados
-          </h2>
+        <ProductosDestacados />
 
-          <div
-            className="
-              mt-10
-              grid
-              grid-cols-1
-              md:grid-cols-2
-              xl:grid-cols-4
-              gap-8
-            "
-          >
-            {/* Próximamente irán ProductoCard */}
-          </div>
-        </section>
       </section>
     </main>
   );
