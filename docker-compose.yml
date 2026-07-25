@@ -1,3 +1,5 @@
+name: hk-store-web
+
 services:
   hk-store-web:
     build: .
