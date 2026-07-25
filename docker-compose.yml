@@ -2,6 +2,7 @@ name: hk-store-web
 
 services:
   hk-store-web:
+    image: hk-store-web
     build: .
     container_name: hk-store-web
     restart: unless-stopped
