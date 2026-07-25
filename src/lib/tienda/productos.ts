@@ -5,6 +5,13 @@ export const productos = [
     categoria: "REMERAS",
     descripcion: "Indumentaria oficial de la Escuela.",
     precio: 0,
+    imagenes: [
+      "/tienda/mercader/remeras/01.jpg",
+      "/tienda/mercader/remeras/02.jpg",
+      "/tienda/mercader/remeras/03.jpg",
+      "/tienda/mercader/remeras/04.jpg",
+      "/tienda/mercader/remeras/05.jpg",
+    ],
   },
   {
     id: 2,
@@ -12,6 +19,7 @@ export const productos = [
     categoria: "HOODIES",
     descripcion: "Abrigo para recorrer el camino.",
     precio: 0,
+    imagenes: [],
   },
   {
     id: 3,
@@ -19,6 +27,7 @@ export const productos = [
     categoria: "JOGGINGS",
     descripcion: "Equipamiento cómodo para entrenar.",
     precio: 0,
+    imagenes: [],
   },
   {
     id: 4,
@@ -26,5 +35,6 @@ export const productos = [
     categoria: "ARTEFACTOS",
     descripcion: "Objeto especial del mercader.",
     precio: 0,
+    imagenes: [],
   },
 ];
