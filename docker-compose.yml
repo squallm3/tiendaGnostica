@@ -1,7 +1,7 @@
 services:
-  haikusgnosticos:
+  hk-store-web:
     build: .
-    container_name: haikusgnosticos
+    container_name: hk-store-web-beta
     restart: unless-stopped
 
     ports:
