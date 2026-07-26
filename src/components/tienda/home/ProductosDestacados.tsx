@@ -42,9 +42,7 @@ export default async function ProductosDestacados() {
               "Próximamente disponible."
             }
             precio={Number(producto.precio)}
-            imagenes={[
-              `/${producto.imagenes}`,
-            ]}
+            imagenes={producto.imagenes}
           />
         ))}
       </div>

@@ -9,7 +9,11 @@ export async function obtenerProductos() {
     throw new Error("No se pudieron obtener los productos.");
   }
 
-  return respuesta.json();
+  const productos = await respuesta.json();
+
+  console.log("API productos:", JSON.stringify(productos, null, 2));
+
+  return productos;
 }
 
 export async function obtenerCategorias() {

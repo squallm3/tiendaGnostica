@@ -1,8 +1,10 @@
 import ProductoCard from "./ProductoCard";
-import { productos } from "@/lib/tienda/productos";
 import CategoriaCard from "./CategoriaCard";
+import { obtenerProductos } from "@/lib/api";
 
-export default function TerminalTienda() {
+export default async function TerminalTienda() {
+  const productos = await obtenerProductos();
+
   const categorias = [
     {
       nombre: "REMERAS",
@@ -53,7 +55,7 @@ export default function TerminalTienda() {
         </section>
 
         <section className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {productos.map((producto) => (
+          {productos.map((producto: any) => (
             <ProductoCard
               key={producto.id}
               nombre={producto.nombre}
