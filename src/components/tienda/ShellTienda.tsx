@@ -1,42 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import ProductosDestacados from "@/components/tienda/home/ProductosDestacados";
+import CategoriaHome from "@/components/tienda/home/CategoriaHome";
 
 export default function ShellTienda() {
-  const categorias = [
-    {
-      nombre: "Remeras",
-      ruta: "/tienda/categorias/remeras",
-      imagen: "/tienda/iconos/remera.png",
-    },
-    {
-      nombre: "Hoodies",
-      ruta: "/tienda/categorias/hoodies",
-      imagen: "/tienda/iconos/hoodie.png",
-    },
-    {
-      nombre: "Joggings",
-      ruta: "/tienda/categorias/joggings",
-      imagen: "/tienda/iconos/joggings.png",
-    },
-    {
-      nombre: "Libros",
-      ruta: "/tienda/categorias/libros",
-      imagen: "/tienda/iconos/libro.png",
-    },
-    {
-      nombre: "Accesorios",
-      ruta: "/tienda/categorias/accesorios",
-      imagen: "/tienda/iconos/accesorios.png",
-    },
-    {
-      nombre: "Artefactos",
-      ruta: "/tienda/categorias/artefactos",
-      imagen: "/tienda/iconos/medallon.png",
-    },
-  ];
-
   return (
     <main
       className="
@@ -147,57 +114,7 @@ export default function ShellTienda() {
 
           {/* CATEGORIAS */}
 
-          <div className="flex justify-center">
-            <div
-              className="
-                w-full
-                max-w-3xl
-                grid
-                grid-cols-2
-                md:grid-cols-3
-                gap-6
-              "
-            >
-              {categorias.map((categoria) => (
-                <Link
-                  key={categoria.nombre}
-                  href={categoria.ruta}
-                  className="
-                    rounded-2xl
-                    border
-                    border-purple-400
-                    bg-black/40
-                    p-6
-                    flex
-                    flex-col
-                    items-center
-                    justify-center
-                    text-purple-200
-                    hover:bg-purple-900/40
-                    transition
-                  "
-                >
-                  <Image
-                    src={categoria.imagen}
-                    alt={categoria.nombre}
-                    width={130}
-                    height={130}
-                    className="object-contain"
-                  />
-
-                  <span
-                    className="
-                      mt-4
-                      text-lg
-                      font-bold
-                    "
-                  >
-                    {categoria.nombre}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <CategoriaHome />
         </div>
 
         {/* PRODUCTOS DESTACADOS */}

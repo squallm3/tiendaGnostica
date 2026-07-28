@@ -1,29 +1,52 @@
+import Image from "next/image";
+import Link from "next/link";
+
 type CategoriaCardProps = {
   nombre: string;
-  icono: string;
-  descripcion: string;
+  slug: string;
+  imagen: string;
 };
 
 export default function CategoriaCard({
   nombre,
-  icono,
-  descripcion,
+  slug,
+  imagen,
 }: CategoriaCardProps) {
   return (
-    <div className="border border-amber-500 p-6 hover:bg-amber-950 transition">
+    <Link
+      href={`/tienda/categorias/${slug}`}
+      className="
+        rounded-2xl
+        border
+        border-purple-400
+        bg-black/40
+        p-6
+        flex
+        flex-col
+        items-center
+        justify-center
+        text-purple-200
+        hover:bg-purple-900/40
+        transition
+      "
+    >
+      <Image
+        src={imagen}
+        alt={nombre}
+        width={130}
+        height={130}
+        className="object-contain"
+      />
 
-      <h2 className="text-2xl">
-        {icono} {nombre}
-      </h2>
-
-      <p className="mt-3 text-amber-200">
-        {descripcion}
-      </p>
-
-      <button className="mt-5 border border-amber-400 px-4 py-2">
-        INGRESAR
-      </button>
-
-    </div>
+      <span
+        className="
+          mt-4
+          text-lg
+          font-bold
+        "
+      >
+        {nombre}
+      </span>
+    </Link>
   );
 }
