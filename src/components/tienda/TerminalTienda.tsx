@@ -7,24 +7,24 @@ export default async function TerminalTienda() {
 
   const categorias = [
     {
-      nombre: "REMERAS",
-      icono: "👕",
-      descripcion: "Indumentaria oficial de la Escuela",
+      nombre: "Remeras",
+      slug: "remeras",
+      imagen: "/tienda/iconos/remera.png",
     },
     {
-      nombre: "HOODIES",
-      icono: "🥋",
-      descripcion: "Abrigos para los iniciados",
+      nombre: "Hoodies",
+      slug: "hoodies",
+      imagen: "/tienda/iconos/hoodie.png",
     },
     {
-      nombre: "JOGGINGS",
-      icono: "👖",
-      descripcion: "Equipamiento cómodo para el camino",
+      nombre: "Joggings",
+      slug: "joggings",
+      imagen: "/tienda/iconos/joggings.png",
     },
     {
-      nombre: "ARTEFACTOS",
-      icono: "🧙‍♂️",
-      descripcion: "Objetos especiales del mercader",
+      nombre: "Artefactos",
+      slug: "artefactos",
+      imagen: "/tienda/iconos/medallon.png",
     },
   ];
 
@@ -48,7 +48,7 @@ export default async function TerminalTienda() {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {categorias.map((categoria) => (
             <CategoriaCard
-              key={categoria.nombre}
+              key={categoria.slug}
               {...categoria}
             />
           ))}
