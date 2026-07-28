@@ -12,6 +12,8 @@ export default function CarruselProducto({
 }: CarruselProductoProps) {
   const [indice, setIndice] = useState(0);
 
+  const hayImagenes = imagenes && imagenes.length > 0;
+
   function anterior() {
     setIndice(
       indice === 0
@@ -39,60 +41,80 @@ export default function CarruselProducto({
         bg-black
       "
     >
-      <Image
-        src={imagenes[indice]}
-        alt="Producto"
-        fill
-        className="
-          object-contain
-        "
-      />
+      {hayImagenes ? (
+        <Image
+          src={imagenes[indice]}
+          alt="Producto"
+          fill
+          className="
+            object-contain
+          "
+        />
+      ) : (
+        <div
+          className="
+            w-full
+            h-full
+            flex
+            items-center
+            justify-center
+            text-purple-400
+            text-sm
+          "
+        >
+          Sin imagen
+        </div>
+      )}
 
-      <button
-        onClick={anterior}
-        className="
-          absolute
-          left-3
-          top-1/2
-          -translate-y-1/2
+      {hayImagenes && imagenes.length > 1 && (
+        <>
+          <button
+            onClick={anterior}
+            className="
+              absolute
+              left-3
+              top-1/2
+              -translate-y-1/2
 
-          bg-black/60
-          border
-          border-purple-400
+              bg-black/60
+              border
+              border-purple-400
 
-          rounded-full
+              rounded-full
 
-          w-10
-          h-10
+              w-10
+              h-10
 
-          text-purple-200
-        "
-      >
-        ‹
-      </button>
+              text-purple-200
+            "
+          >
+            ‹
+          </button>
 
-      <button
-        onClick={siguiente}
-        className="
-          absolute
-          right-3
-          top-1/2
-          -translate-y-1/2
+          <button
+            onClick={siguiente}
+            className="
+              absolute
+              right-3
+              top-1/2
+              -translate-y-1/2
 
-          bg-black/60
-          border
-          border-purple-400
+              bg-black/60
+              border
+              border-purple-400
 
-          rounded-full
+              rounded-full
 
-          w-10
-          h-10
+              w-10
+              h-10
 
-          text-purple-200
-        "
-      >
-        ›
-      </button>
+              text-purple-200
+            "
+          >
+            ›
+          </button>
+        </>
+      )}
     </div>
   );
 }
