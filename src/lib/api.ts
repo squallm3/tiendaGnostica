@@ -1,4 +1,4 @@
-const API_URL = "http://192.168.1.133:3001/api";
+const API_URL = process.env.API_URL || "http://192.168.1.133:3001/api";
 
 export async function obtenerProductos() {
   const respuesta = await fetch(`${API_URL}/productos`, {
