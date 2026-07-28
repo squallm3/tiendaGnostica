@@ -1,40 +1,10 @@
-export const productos = [
-  {
-    id: 1,
-    nombre: "Remera Gnóstica",
-    categoria: "REMERAS",
-    descripcion: "Indumentaria oficial de la Escuela.",
-    precio: 0,
-    imagenes: [
-      "/tienda/mercader/remeras/01.jpg",
-      "/tienda/mercader/remeras/02.jpg",
-      "/tienda/mercader/remeras/03.jpg",
-      "/tienda/mercader/remeras/04.jpg",
-      "/tienda/mercader/remeras/05.jpg",
-    ],
-  },
-  {
-    id: 2,
-    nombre: "Hoodie del Iniciado",
-    categoria: "HOODIES",
-    descripcion: "Abrigo para recorrer el camino.",
-    precio: 0,
-    imagenes: [],
-  },
-  {
-    id: 3,
-    nombre: "Jogging del Camino",
-    categoria: "JOGGINGS",
-    descripcion: "Equipamiento cómodo para entrenar.",
-    precio: 0,
-    imagenes: [],
-  },
-  {
-    id: 4,
-    nombre: "Artefacto Gnóstico",
-    categoria: "ARTEFACTOS",
-    descripcion: "Objeto especial del mercader.",
-    precio: 0,
-    imagenes: [],
-  },
-];
+import { obtenerProductos, obtenerCategorias } from "@/lib/api";
+import type { Producto, Categoria } from "@/lib/tienda/types";
+
+export async function obtenerProductosTienda(): Promise<Producto[]> {
+  return obtenerProductos();
+}
+
+export async function obtenerCategoriasTienda(): Promise<Categoria[]> {
+  return obtenerCategorias();
+}
