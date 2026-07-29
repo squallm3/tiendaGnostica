@@ -1,26 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  type User,
-} from "firebase/auth";
+import { signInWithPopup, signOut } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
+import { useAuth } from "@/lib/tienda/AuthContext";
 
 export default function BotonLoginGoogle() {
-  const [usuario, setUsuario] = useState<User | null>(null);
-  const [cargando, setCargando] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUsuario(user);
-      setCargando(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const { usuario, cargando } = useAuth();
 
   async function iniciarSesion() {
     try {
