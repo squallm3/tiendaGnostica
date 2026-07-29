@@ -9,6 +9,7 @@ import {
 } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { sincronizarUsuario } from "@/lib/api";
 
 interface AuthContextValue {
   usuario: User | null;
@@ -30,7 +31,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUsuario(user);
-      setToken(user ? await user.getIdToken() : null);
+
+      if (user) {
+        const idToken = await user.getIdToken();
+        setToken(idToken);
+
+        try {
+          await sincronizarUsuario(idToken);
+        } catch (error) {
+          console.error("Error al sincronizar usuario:", error);
+        }
+      } else {
+        setToken(null);
+      }
+
       setCargando(false);
     });
 

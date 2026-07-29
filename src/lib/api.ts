@@ -55,3 +55,18 @@ export async function obtenerCategoriaPorSlug(slug: string) {
 
   return respuesta.json();
 }
+
+export async function sincronizarUsuario(token: string) {
+  const respuesta = await fetch(`${API_URL}/usuarios/sync`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo sincronizar el usuario.");
+  }
+
+  return respuesta.json();
+}
