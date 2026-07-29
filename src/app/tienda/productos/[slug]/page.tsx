@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import CarruselProducto from "@/components/tienda/CarruselProducto";
+import AgregarCarrito from "@/components/tienda/producto/AgregarCarrito";
 import { obtenerProductoTienda } from "@/lib/tienda/productos";
 
 interface Props {
@@ -60,47 +61,11 @@ export default async function ProductoPage({ params }: Props) {
             ${precioFormateado}
           </p>
 
-          {producto.variantes.length > 0 && (
-            <div className="mt-6">
-              <p className="text-purple-200 mb-2">Elegí una opción:</p>
-
-              <div className="flex flex-wrap gap-3">
-                {producto.variantes.map((variante) => (
-                  <span
-                    key={variante.uuid}
-                    className="
-                      border
-                      border-purple-400
-                      px-3
-                      py-1
-                      rounded-lg
-                      text-sm
-                      text-purple-200
-                    "
-                  >
-                    {[variante.talle, variante.color]
-                      .filter(Boolean)
-                      .join(" / ") || "Única"}
-                    {variante.stock === 0 && " (sin stock)"}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <button
-            className="
-              mt-8
-              border
-              border-purple-400
-              px-6
-              py-3
-              rounded-lg
-              text-purple-200
-            "
-          >
-            AGREGAR AL CARRITO
-          </button>
+          <AgregarCarrito
+            producto={producto}
+            precioNumero={precioNumero}
+            imagenPrincipal={imagenes[0] ?? null}
+          />
         </div>
       </section>
     </main>
