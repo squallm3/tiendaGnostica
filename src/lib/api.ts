@@ -9,11 +9,7 @@ export async function obtenerProductos() {
     throw new Error("No se pudieron obtener los productos.");
   }
 
-  const productos = await respuesta.json();
-
-  console.log("API productos:", JSON.stringify(productos, null, 2));
-
-  return productos;
+  return respuesta.json();
 }
 
 export async function obtenerCategorias() {
@@ -23,6 +19,22 @@ export async function obtenerCategorias() {
 
   if (!respuesta.ok) {
     throw new Error("No se pudieron obtener las categorías.");
+  }
+
+  return respuesta.json();
+}
+
+export async function obtenerCategoriaPorSlug(slug: string) {
+  const respuesta = await fetch(`${API_URL}/categorias/${slug}`, {
+    cache: "no-store",
+  });
+
+  if (respuesta.status === 404) {
+    return null;
+  }
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo obtener la categoría.");
   }
 
   return respuesta.json();
