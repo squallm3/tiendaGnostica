@@ -36,6 +36,7 @@ export default async function ProductosDestacados() {
         {productos.map((producto: any) => (
           <ProductoCard
             key={producto.uuid}
+            slug={producto.slug}
             nombre={producto.nombre}
             descripcion={
               producto.descripcionCorta ??
@@ -43,6 +44,7 @@ export default async function ProductosDestacados() {
             }
             precio={Number(producto.precio)}
             imagenes={producto.imagenes}
+            categoriaNombre={producto.categoriaNombre}
           />
         ))}
       </div>

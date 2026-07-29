@@ -28,27 +28,34 @@ export default async function CategoriaPage({ params }: Props) {
           <MercaderBanner categoria={categoria.slug} />
         </div>
 
-        <div
-          className="
-            mt-10
-            grid
-            grid-cols-1
-            md:grid-cols-3
-            gap-6
-          "
-        >
-          {categoria.productos.map((producto) => (
-            <ProductoCard
-              key={producto.uuid}
-              nombre={producto.nombre}
-              descripcion={
-                producto.descripcionCorta ?? "Próximamente disponible."
-              }
-              precio={producto.precio}
-              imagenes={producto.imagenes}
-            />
-          ))}
-        </div>
+        {categoria.productos.length === 0 ? (
+          <p className="mt-10 text-purple-300">
+            Todavía no hay productos cargados en esta categoría.
+          </p>
+        ) : (
+          <div
+            className="
+              mt-10
+              grid
+              grid-cols-1
+              md:grid-cols-3
+              gap-6
+            "
+          >
+            {categoria.productos.map((producto) => (
+              <ProductoCard
+                key={producto.uuid}
+                slug={producto.slug}
+                nombre={producto.nombre}
+                descripcion={
+                  producto.descripcionCorta ?? "Próximamente disponible."
+                }
+                precio={producto.precio}
+                imagenes={producto.imagenes}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );

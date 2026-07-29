@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CarruselProducto from "./CarruselProducto";
 
 type ProductoCardProps = {
@@ -6,6 +7,7 @@ type ProductoCardProps = {
   precio: number | string;
   imagenes: string[];
   categoriaNombre?: string;
+  slug?: string;
 };
 
 export default function ProductoCard({
@@ -14,6 +16,7 @@ export default function ProductoCard({
   precio,
   imagenes,
   categoriaNombre,
+  slug,
 }: ProductoCardProps) {
   const precioNumero = Number(precio);
   const precioFormateado = Number.isFinite(precioNumero)
@@ -77,19 +80,42 @@ export default function ProductoCard({
         ${precioFormateado}
       </p>
 
-      <button
-        className="
-          mt-4
-          border
-          border-purple-400
-          px-4
-          py-2
-          rounded-lg
-          text-purple-200
-        "
-      >
-        VER DETALLE
-      </button>
+      {slug ? (
+        <Link
+          href={`/tienda/productos/${slug}`}
+          className="
+            mt-4
+            block
+            text-center
+            border
+            border-purple-400
+            px-4
+            py-2
+            rounded-lg
+            text-purple-200
+          "
+        >
+          VER DETALLE
+        </Link>
+      ) : (
+        <button
+          disabled
+          className="
+            mt-4
+            w-full
+            border
+            border-purple-400
+            px-4
+            py-2
+            rounded-lg
+            text-purple-200
+            opacity-40
+            cursor-not-allowed
+          "
+        >
+          VER DETALLE
+        </button>
+      )}
     </div>
   );
 }
