@@ -12,6 +12,22 @@ export async function obtenerProductos() {
   return respuesta.json();
 }
 
+export async function obtenerProductoPorSlug(slug: string) {
+  const respuesta = await fetch(`${API_URL}/productos/${slug}`, {
+    cache: "no-store",
+  });
+
+  if (respuesta.status === 404) {
+    return null;
+  }
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo obtener el producto.");
+  }
+
+  return respuesta.json();
+}
+
 export async function obtenerCategorias() {
   const respuesta = await fetch(`${API_URL}/categorias`, {
     cache: "no-store",
