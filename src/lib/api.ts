@@ -70,3 +70,32 @@ export async function sincronizarUsuario(token: string) {
 
   return respuesta.json();
 }
+
+interface CrearPedidoPayload {
+  items: {
+    varianteId: number | null;
+    cantidad: number;
+    precioUnitario: number;
+    nombreProducto: string;
+  }[];
+  metodoPago: string;
+  direccionEnvio: Record<string, unknown> | null;
+  notas?: string;
+}
+
+export async function crearPedido(token: string, payload: CrearPedidoPayload) {
+  const respuesta = await fetch(`${API_URL}/pedidos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo crear el pedido.");
+  }
+
+  return respuesta.json();
+}
