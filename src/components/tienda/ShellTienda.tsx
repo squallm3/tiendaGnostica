@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import ProductosDestacados from "@/components/tienda/home/ProductosDestacados";
 import CategoriaHome from "@/components/tienda/home/CategoriaHome";
+import BotonLoginGoogle from "@/components/tienda/BotonLoginGoogle";
 
 export default function ShellTienda() {
   return (
@@ -28,8 +29,14 @@ export default function ShellTienda() {
             absolute
             top-6
             right-6
+            flex
+            flex-col
+            items-end
+            gap-3
           "
         >
+          <BotonLoginGoogle />
+
           <Image
             src="/tienda/player-icon/20pers.png"
             alt="Jugador"
