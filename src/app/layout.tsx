@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { AuthProvider } from "@/lib/tienda/AuthContext";
 import { CartProvider } from "@/lib/tienda/CartContext";
 import BotonCarritoFlotante from "@/components/tienda/BotonCarritoFlotante";
+import RegistrarServiceWorker from "@/components/tienda/RegistrarServiceWorker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,9 +20,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Escuela de los Haikus Gnósticos",
   description: "Bienvenido a la magia del Kaos",
+  manifest: "/manifest.json",
   icons: {
-    icon: '/favicon.png',
+    icon: "/favicon.png",
+    apple: "/tienda/pwa/icon-192.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#4c1d95",
 };
 
 export default function RootLayout({
@@ -50,6 +57,7 @@ export default function RootLayout({
             <BotonCarritoFlotante />
           </CartProvider>
         </AuthProvider>
+        <RegistrarServiceWorker />
       </body>
     </html>
   );
