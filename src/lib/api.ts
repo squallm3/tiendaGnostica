@@ -56,8 +56,12 @@ export async function obtenerCategoriaPorSlug(slug: string) {
   return respuesta.json();
 }
 
+// Las siguientes dos funciones corren en el navegador, por eso NO usan
+// API_URL (IP interna, inalcanzable desde afuera de la red). Usan rutas
+// propias de Next.js (/api/...) que hacen de puente hacia hk-backend.
+
 export async function sincronizarUsuario(token: string) {
-  const respuesta = await fetch(`${API_URL}/usuarios/sync`, {
+  const respuesta = await fetch(`/api/usuarios/sync`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -84,7 +88,7 @@ interface CrearPedidoPayload {
 }
 
 export async function crearPedido(token: string, payload: CrearPedidoPayload) {
-  const respuesta = await fetch(`${API_URL}/pedidos`, {
+  const respuesta = await fetch(`/api/pedidos`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
