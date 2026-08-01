@@ -4,6 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import { AuthProvider } from "@/lib/tienda/AuthContext";
 import { CartProvider } from "@/lib/tienda/CartContext";
+import BotonCarritoFlotante from "@/components/tienda/BotonCarritoFlotante";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +45,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <CartProvider>{children}</CartProvider>
+          <CartProvider>
+            {children}
+            <BotonCarritoFlotante />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
