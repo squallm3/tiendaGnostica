@@ -10,6 +10,9 @@ const IMAGEN_POR_SLUG: Record<string, string> = {
   joggings: "/tienda/iconos/joggings.png",
   libros: "/tienda/iconos/libro.png",
   artefactos: "/tienda/iconos/medallon.png",
+  tazas: "/tienda/iconos/tazas.png",
+  stickers: "/tienda/iconos/stickers.png",
+  "objetos-personalizados": "/tienda/iconos/objetos-personalizados.png",
 };
 
 const IMAGEN_POR_DEFECTO = "/tienda/iconos/accesorios.png";
