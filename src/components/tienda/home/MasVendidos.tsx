@@ -56,6 +56,7 @@ export default async function MasVendidos() {
             precio={Number(producto.precio)}
             imagenes={producto.imagenes}
             categoriaNombre={producto.categoriaNombre}
+            nivelRequerido={producto.nivelRequerido}
           />
         ))}
       </div>

@@ -58,6 +58,7 @@ export default async function ProductosDestacados() {
             precio={Number(producto.precio)}
             imagenes={producto.imagenes}
             categoriaNombre={producto.categoriaNombre}
+            nivelRequerido={producto.nivelRequerido}
           />
         ))}
       </div>

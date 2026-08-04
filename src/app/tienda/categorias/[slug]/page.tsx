@@ -52,6 +52,7 @@ export default async function CategoriaPage({ params }: Props) {
                 }
                 precio={producto.precio}
                 imagenes={producto.imagenes}
+                nivelRequerido={producto.nivelRequerido}
               />
             ))}
           </div>
