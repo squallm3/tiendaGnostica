@@ -69,6 +69,18 @@ export async function obtenerCategoriaPorSlug(slug: string) {
   return respuesta.json();
 }
 
+export async function obtenerNivelesConProductos() {
+  const respuesta = await fetch(`${API_URL}/niveles/con-productos`, {
+    cache: "no-store",
+  });
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudieron obtener los niveles.");
+  }
+
+  return respuesta.json();
+}
+
 // Las siguientes dos funciones corren en el navegador, por eso NO usan
 // API_URL (IP interna, inalcanzable desde afuera de la red). Usan rutas
 // propias de Next.js (/api/...) que hacen de puente hacia hk-backend.

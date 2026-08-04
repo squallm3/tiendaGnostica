@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CategoriaCard from "@/components/tienda/CategoriaCard";
 import { obtenerCategoriasTienda } from "@/lib/tienda/productos";
 
@@ -22,26 +23,51 @@ export default async function CategoriaHome() {
 
   return (
     <div className="flex justify-center">
-      <div
-        className="
-          w-full
-          max-w-3xl
-          grid
-          grid-cols-2
-          md:grid-cols-3
-          gap-6
-        "
-      >
-        {categorias.map((categoria) => (
-          <CategoriaCard
-            key={categoria.uuid}
-            nombre={categoria.nombre}
-            slug={categoria.slug}
-            imagen={
-              IMAGEN_POR_SLUG[categoria.slug] ?? IMAGEN_POR_DEFECTO
-            }
-          />
-        ))}
+      <div className="w-full max-w-3xl flex flex-col gap-6">
+        {/* BOTON PRODUCTOS DE MI NIVEL */}
+
+        <Link
+          href="/tienda/niveles"
+          className="
+            block
+            text-center
+            rounded-2xl
+            border-2
+            border-purple-300
+            bg-purple-900/50
+            py-6
+            px-6
+            text-2xl
+            font-bold
+            text-purple-100
+            hover:bg-purple-800/60
+            transition
+          "
+        >
+          ⚔️ Productos de mi nivel
+        </Link>
+
+        {/* CATEGORIAS */}
+
+        <div
+          className="
+            grid
+            grid-cols-2
+            md:grid-cols-3
+            gap-6
+          "
+        >
+          {categorias.map((categoria) => (
+            <CategoriaCard
+              key={categoria.uuid}
+              nombre={categoria.nombre}
+              slug={categoria.slug}
+              imagen={
+                IMAGEN_POR_SLUG[categoria.slug] ?? IMAGEN_POR_DEFECTO
+              }
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
