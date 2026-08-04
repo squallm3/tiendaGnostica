@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/tienda/AuthContext";
 import { CartProvider } from "@/lib/tienda/CartContext";
 import BotonCarritoFlotante from "@/components/tienda/BotonCarritoFlotante";
 import BotonWhatsApp from "@/components/tienda/BotonWhatsApp";
+import PopupNewsletter from "@/components/tienda/PopupNewsletter";
 import RegistrarServiceWorker from "@/components/tienda/RegistrarServiceWorker";
 
 const geistSans = Geist({
@@ -57,6 +58,7 @@ export default function RootLayout({
             {children}
             <BotonWhatsApp />
             <BotonCarritoFlotante />
+            <PopupNewsletter />
           </CartProvider>
         </AuthProvider>
         <RegistrarServiceWorker />

@@ -1,4 +1,39 @@
+"use client";
+
+import { useState } from "react";
+
 export default function FooterTienda() {
+  const [email, setEmail] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+
+  async function suscribir() {
+    if (!email.includes("@")) {
+      setMensaje("Ingresá un email válido.");
+      return;
+    }
+
+    setEnviando(true);
+    setMensaje(null);
+
+    try {
+      const respuesta = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!respuesta.ok) throw new Error();
+
+      setMensaje("¡Listo! Ya estás suscripto.");
+      setEmail("");
+    } catch {
+      setMensaje("No pudimos suscribirte. Probá más tarde.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   return (
     <footer
       className="
@@ -39,23 +74,35 @@ export default function FooterTienda() {
         {/* COLUMNA DERECHA - CONTACTO */}
 
         <div className="flex flex-col gap-8">
-          {/* NEWSLETTER (pendiente de conectar a Mailchimp) */}
+          {/* NEWSLETTER */}
 
-          <div className="flex items-center gap-4 border-b border-purple-700 pb-3">
-            <input
-              type="email"
-              placeholder="Email"
-              className="
-                flex-1
-                bg-transparent
-                text-purple-100
-                placeholder-purple-400
-                outline-none
-              "
-            />
-            <button className="text-purple-200 font-bold">
-              Enviar
-            </button>
+          <div>
+            <div className="flex items-center gap-4 border-b border-purple-700 pb-3">
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="
+                  flex-1
+                  bg-transparent
+                  text-purple-100
+                  placeholder-purple-400
+                  outline-none
+                "
+              />
+              <button
+                onClick={suscribir}
+                disabled={enviando}
+                className="text-purple-200 font-bold disabled:opacity-40"
+              >
+                {enviando ? "..." : "Enviar"}
+              </button>
+            </div>
+
+            {mensaje && (
+              <p className="mt-2 text-sm text-purple-300">{mensaje}</p>
+            )}
           </div>
 
           {/* REDES */}
