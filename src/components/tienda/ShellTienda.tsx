@@ -4,6 +4,7 @@ import ProductosDestacados from "@/components/tienda/home/ProductosDestacados";
 import CategoriaHome from "@/components/tienda/home/CategoriaHome";
 import IconosInfo from "@/components/tienda/home/IconosInfo";
 import MasVendidos from "@/components/tienda/home/MasVendidos";
+import IconoJugador from "@/components/tienda/IconoJugador";
 
 export default function ShellTienda() {
   return (
@@ -25,21 +26,6 @@ export default function ShellTienda() {
           p-8
         "
       >
-        <div
-          className="
-            absolute
-            top-6
-            right-6
-          "
-        >
-          <Image
-            src="/tienda/player-icon/20pers.png"
-            alt="Jugador"
-            width={60}
-            height={60}
-          />
-        </div>
-
         {/* HERO + CATEGORIAS */}
 
         <div
@@ -103,9 +89,13 @@ export default function ShellTienda() {
               <div className="h-px w-32 bg-purple-500" />
             </div>
 
+            <div className="mt-10">
+              <IconoJugador />
+            </div>
+
             <p
               className="
-                mt-10
+                mt-8
                 text-xl
                 text-purple-300
               "
