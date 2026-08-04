@@ -12,6 +12,19 @@ export async function obtenerProductos() {
   return respuesta.json();
 }
 
+export async function obtenerProductosMasVendidos(limite: number = 8) {
+  const respuesta = await fetch(
+    `${API_URL}/productos/mas-vendidos?limite=${limite}`,
+    { cache: "no-store" }
+  );
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudieron obtener los productos más vendidos.");
+  }
+
+  return respuesta.json();
+}
+
 export async function obtenerProductoPorSlug(slug: string) {
   const respuesta = await fetch(`${API_URL}/productos/${slug}`, {
     cache: "no-store",

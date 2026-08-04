@@ -3,6 +3,7 @@ import Image from "next/image";
 import ProductosDestacados from "@/components/tienda/home/ProductosDestacados";
 import CategoriaHome from "@/components/tienda/home/CategoriaHome";
 import IconosInfo from "@/components/tienda/home/IconosInfo";
+import MasVendidos from "@/components/tienda/home/MasVendidos";
 
 export default function ShellTienda() {
   return (
@@ -125,6 +126,10 @@ export default function ShellTienda() {
         {/* ICONOS INFORMATIVOS */}
 
         <IconosInfo />
+
+        {/* MAS VENDIDOS */}
+
+        <MasVendidos />
 
       </section>
     </main>
