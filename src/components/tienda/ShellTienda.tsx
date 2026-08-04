@@ -5,6 +5,7 @@ import CategoriaHome from "@/components/tienda/home/CategoriaHome";
 import IconosInfo from "@/components/tienda/home/IconosInfo";
 import MasVendidos from "@/components/tienda/home/MasVendidos";
 import IconoJugador from "@/components/tienda/IconoJugador";
+import FooterTienda from "@/components/tienda/FooterTienda";
 
 export default function ShellTienda() {
   return (
@@ -122,6 +123,10 @@ export default function ShellTienda() {
         <MasVendidos />
 
       </section>
+
+      {/* FOOTER */}
+
+      <FooterTienda />
     </main>
   );
 }
