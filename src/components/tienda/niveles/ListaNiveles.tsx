@@ -10,6 +10,7 @@ interface ProductoNivel {
   nombre: string;
   slug: string;
   precio: string;
+  precioOferta: string | null;
   imagenes: string[];
   categoriaNombre: string | null;
 }
@@ -22,6 +23,11 @@ interface Nivel {
   imagenA: string | null;
   xpAcumulada: number | null;
   productos: ProductoNivel[];
+}
+
+function formatear(valor: number | string) {
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero.toLocaleString("es-AR") : valor;
 }
 
 export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
@@ -95,6 +101,12 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {nivel.productos.map((producto) => {
+                      const hayOferta =
+                        producto.precioOferta !== null &&
+                        producto.precioOferta !== undefined &&
+                        Number(producto.precioOferta) > 0 &&
+                        Number(producto.precioOferta) < Number(producto.precio);
+
                       const contenido = (
                         <div
                           className={`border border-purple-600 rounded-lg p-2 ${
@@ -120,9 +132,20 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
                             {producto.nombre}
                           </p>
 
-                          <p className="text-xs text-purple-400 font-bold">
-                            ${Number(producto.precio).toLocaleString("es-AR")}
-                          </p>
+                          {hayOferta ? (
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-xs text-purple-400 font-bold">
+                                ${formatear(producto.precioOferta!)}
+                              </span>
+                              <span className="text-[10px] text-purple-600 line-through">
+                                ${formatear(producto.precio)}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-purple-400 font-bold">
+                              ${formatear(producto.precio)}
+                            </span>
+                          )}
                         </div>
                       );
 

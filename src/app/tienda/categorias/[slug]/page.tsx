@@ -42,7 +42,7 @@ export default async function CategoriaPage({ params }: Props) {
               gap-6
             "
           >
-            {categoria.productos.map((producto) => (
+            {categoria.productos.map((producto: any) => (
               <ProductoCard
                 key={producto.uuid}
                 slug={producto.slug}
@@ -51,6 +51,7 @@ export default async function CategoriaPage({ params }: Props) {
                   producto.descripcionCorta ?? "Próximamente disponible."
                 }
                 precio={producto.precio}
+                precioOferta={producto.precioOferta}
                 imagenes={producto.imagenes}
                 nivelRequerido={producto.nivelRequerido}
               />

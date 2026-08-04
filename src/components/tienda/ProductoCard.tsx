@@ -8,16 +8,23 @@ type ProductoCardProps = {
   nombre: string;
   descripcion: string;
   precio: number | string;
+  precioOferta?: number | string | null;
   imagenes: string[];
   categoriaNombre?: string;
   slug?: string;
   nivelRequerido?: number | null;
 };
 
+function formatear(valor: number | string) {
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero.toLocaleString("es-AR") : valor;
+}
+
 export default function ProductoCard({
   nombre,
   descripcion,
   precio,
+  precioOferta,
   imagenes,
   categoriaNombre,
   slug,
@@ -28,10 +35,11 @@ export default function ProductoCard({
   const nivelNecesario = nivelRequerido ?? 1;
   const bloqueado = nivelNecesario > nivelUsuario;
 
-  const precioNumero = Number(precio);
-  const precioFormateado = Number.isFinite(precioNumero)
-    ? precioNumero.toLocaleString("es-AR")
-    : precio;
+  const hayOferta =
+    precioOferta !== null &&
+    precioOferta !== undefined &&
+    Number(precioOferta) > 0 &&
+    Number(precioOferta) < Number(precio);
 
   return (
     <div
@@ -60,9 +68,22 @@ export default function ProductoCard({
 
         <p className="mt-2 text-purple-200">{descripcion}</p>
 
-        <p className="mt-3 text-purple-400 font-bold">
-          ${precioFormateado}
-        </p>
+        <div className="mt-3 flex items-baseline gap-3">
+          {hayOferta ? (
+            <>
+              <span className="text-purple-400 font-bold text-lg">
+                ${formatear(precioOferta!)}
+              </span>
+              <span className="text-purple-600 line-through text-sm">
+                ${formatear(precio)}
+              </span>
+            </>
+          ) : (
+            <span className="text-purple-400 font-bold text-lg">
+              ${formatear(precio)}
+            </span>
+          )}
+        </div>
       </div>
 
       {bloqueado ? (

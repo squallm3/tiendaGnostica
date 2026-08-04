@@ -10,9 +10,14 @@ interface Props {
   }>;
 }
 
+function formatear(valor: number | string) {
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero.toLocaleString("es-AR") : valor;
+}
+
 export default async function ProductoPage({ params }: Props) {
   const { slug } = await params;
-  const producto = await obtenerProductoTienda(slug);
+  const producto: any = await obtenerProductoTienda(slug);
 
   if (!producto) {
     notFound();
@@ -20,13 +25,19 @@ export default async function ProductoPage({ params }: Props) {
 
   const imagenes = producto.imagenes
     .slice()
-    .sort((a, b) => a.orden - b.orden)
-    .map((imagen) => imagen.url);
+    .sort((a: any, b: any) => a.orden - b.orden)
+    .map((imagen: any) => imagen.url);
 
-  const precioNumero = Number(producto.precio);
-  const precioFormateado = Number.isFinite(precioNumero)
-    ? precioNumero.toLocaleString("es-AR")
-    : producto.precio;
+  const hayOferta =
+    producto.precioOferta !== null &&
+    producto.precioOferta !== undefined &&
+    Number(producto.precioOferta) > 0 &&
+    Number(producto.precioOferta) < Number(producto.precio);
+
+  // El precio que realmente se cobra
+  const precioFinal = hayOferta
+    ? Number(producto.precioOferta)
+    : Number(producto.precio);
 
   return (
     <main className="min-h-screen bg-black text-white p-6">
@@ -57,13 +68,26 @@ export default async function ProductoPage({ params }: Props) {
             </p>
           )}
 
-          <p className="mt-6 text-2xl font-bold text-purple-400">
-            ${precioFormateado}
-          </p>
+          <div className="mt-6 flex items-baseline gap-4">
+            {hayOferta ? (
+              <>
+                <span className="text-3xl font-bold text-purple-400">
+                  ${formatear(producto.precioOferta)}
+                </span>
+                <span className="text-lg text-purple-600 line-through">
+                  ${formatear(producto.precio)}
+                </span>
+              </>
+            ) : (
+              <span className="text-3xl font-bold text-purple-400">
+                ${formatear(producto.precio)}
+              </span>
+            )}
+          </div>
 
           <AgregarCarrito
             producto={producto}
-            precioNumero={precioNumero}
+            precioNumero={precioFinal}
             imagenPrincipal={imagenes[0] ?? null}
           />
         </div>

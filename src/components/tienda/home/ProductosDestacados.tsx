@@ -55,7 +55,8 @@ export default async function ProductosDestacados() {
               producto.descripcionCorta ??
               "Próximamente disponible."
             }
-            precio={Number(producto.precio)}
+            precio={producto.precio}
+            precioOferta={producto.precioOferta}
             imagenes={producto.imagenes}
             categoriaNombre={producto.categoriaNombre}
             nivelRequerido={producto.nivelRequerido}
