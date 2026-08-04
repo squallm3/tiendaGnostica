@@ -5,7 +5,7 @@ import Link from "next/link";
 import RequiereSesion from "@/components/tienda/RequiereSesion";
 import { useAuth } from "@/lib/tienda/AuthContext";
 import { useCart } from "@/lib/tienda/CartContext";
-import { crearPedido } from "@/lib/api";
+import { crearPedido, crearPreferenciaPago } from "@/lib/api";
 
 type Entrega = "envio" | "retiro";
 type MetodoPago = "mercadopago" | "efectivo";
@@ -46,6 +46,14 @@ function FormularioCheckout() {
             : { tipo: "retiro" },
       });
 
+      if (metodoPago === "mercadopago") {
+        const preferencia = await crearPreferenciaPago(token, pedido.id);
+        vaciarCarrito();
+        // Redirigimos al checkout de Mercado Pago
+        window.location.href = preferencia.initPoint;
+        return;
+      }
+
       setPedidoUuid(pedido.uuid);
       vaciarCarrito();
     } catch (err) {
@@ -64,6 +72,9 @@ function FormularioCheckout() {
         </h1>
         <p className="text-purple-300">
           Número de pedido: <span className="text-purple-100">{pedidoUuid}</span>
+        </p>
+        <p className="text-purple-300">
+          Coordinamos el pago en efectivo al momento de la entrega o el retiro.
         </p>
         <Link
           href="/"
@@ -201,12 +212,6 @@ function FormularioCheckout() {
               Mercado Pago
             </button>
           </div>
-          {metodoPago === "mercadopago" && (
-            <p className="text-sm text-purple-400 mt-2">
-              La integración real de pago todavía no está activa; el pedido
-              queda registrado como pendiente.
-            </p>
-          )}
         </div>
 
         {error && <p className="text-red-400 mb-4">{error}</p>}
@@ -225,7 +230,11 @@ function FormularioCheckout() {
             disabled:opacity-40
           "
         >
-          {enviando ? "Confirmando..." : "CONFIRMAR PEDIDO"}
+          {enviando
+            ? "Procesando..."
+            : metodoPago === "mercadopago"
+            ? "PAGAR CON MERCADO PAGO"
+            : "CONFIRMAR PEDIDO"}
         </button>
       </section>
     </main>

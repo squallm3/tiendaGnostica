@@ -81,7 +81,7 @@ export async function obtenerNivelesConProductos() {
   return respuesta.json();
 }
 
-// Las siguientes dos funciones corren en el navegador, por eso NO usan
+// Las siguientes funciones corren en el navegador, por eso NO usan
 // API_URL (IP interna, inalcanzable desde afuera de la red). Usan rutas
 // propias de Next.js (/api/...) que hacen de puente hacia hk-backend.
 
@@ -124,6 +124,23 @@ export async function crearPedido(token: string, payload: CrearPedidoPayload) {
 
   if (!respuesta.ok) {
     throw new Error("No se pudo crear el pedido.");
+  }
+
+  return respuesta.json();
+}
+
+export async function crearPreferenciaPago(token: string, pedidoId: number) {
+  const respuesta = await fetch(`/api/pagos/preferencia`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ pedidoId }),
+  });
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo generar el link de pago.");
   }
 
   return respuesta.json();
