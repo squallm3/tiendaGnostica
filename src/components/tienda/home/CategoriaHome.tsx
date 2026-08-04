@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import CategoriaCard from "@/components/tienda/CategoriaCard";
 import { obtenerCategoriasTienda } from "@/lib/tienda/productos";
@@ -29,8 +30,10 @@ export default async function CategoriaHome() {
         <Link
           href="/tienda/niveles"
           className="
-            block
-            text-center
+            flex
+            items-center
+            justify-center
+            gap-4
             rounded-2xl
             border-2
             border-purple-300
@@ -44,7 +47,14 @@ export default async function CategoriaHome() {
             transition
           "
         >
-          ⚔️ Productos de mi nivel
+          <Image
+            src="/tienda/iconos/productos-nivel.png"
+            alt="Productos de mi nivel"
+            width={64}
+            height={64}
+            className="object-contain"
+          />
+          Productos de mi nivel
         </Link>
 
         {/* CATEGORIAS */}
