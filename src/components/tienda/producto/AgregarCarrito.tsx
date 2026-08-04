@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
 import { useCart } from "@/lib/tienda/CartContext";
+import { useAuth } from "@/lib/tienda/AuthContext";
 import type { ProductoDetalle } from "@/lib/tienda/types";
 
 interface Props {
@@ -16,6 +19,7 @@ export default function AgregarCarrito({
   imagenPrincipal,
 }: Props) {
   const { agregarAlCarrito } = useCart();
+  const { usuario } = useAuth();
   const [varianteId, setVarianteId] = useState<number | null>(
     producto.variantes[0]?.id ?? null
   );
@@ -24,7 +28,17 @@ export default function AgregarCarrito({
   const variante = producto.variantes.find((v) => v.id === varianteId) ?? null;
   const sinStock = variante ? variante.stock === 0 : false;
 
-  function handleAgregar() {
+  async function handleAgregar() {
+    // Si no hay sesion, primero pedimos login
+    if (!usuario) {
+      try {
+        await signInWithPopup(auth, googleProvider);
+      } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+      }
+      return;
+    }
+
     const id =
       varianteId !== null ? `variante-${varianteId}` : `producto-${producto.id}`;
 
@@ -86,7 +100,11 @@ export default function AgregarCarrito({
           disabled:cursor-not-allowed
         "
       >
-        {agregado ? "¡Agregado!" : "AGREGAR AL CARRITO"}
+        {!usuario
+          ? "INICIÁ SESIÓN PARA COMPRAR"
+          : agregado
+          ? "¡Agregado!"
+          : "AGREGAR AL CARRITO"}
       </button>
     </div>
   );

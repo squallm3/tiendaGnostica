@@ -1,14 +1,33 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
 import { useCart } from "@/lib/tienda/CartContext";
+import { useAuth } from "@/lib/tienda/AuthContext";
 
 export default function BotonCarritoFlotante() {
   const { cantidadTotal } = useCart();
+  const { usuario } = useAuth();
+  const router = useRouter();
+
+  async function handleClick() {
+    if (!usuario) {
+      try {
+        await signInWithPopup(auth, googleProvider);
+      } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+      }
+      return;
+    }
+
+    router.push("/tienda/carrito");
+  }
 
   return (
-    <Link
-      href="/tienda/carrito"
+    <button
+      onClick={handleClick}
+      aria-label="Ver carrito"
       className="
         fixed
         bottom-6
@@ -49,6 +68,6 @@ export default function BotonCarritoFlotante() {
           {cantidadTotal}
         </span>
       )}
-    </Link>
+    </button>
   );
 }
