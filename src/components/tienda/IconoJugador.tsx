@@ -2,18 +2,18 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
 import { useAuth } from "@/lib/tienda/AuthContext";
 
-const IMAGEN_POR_DEFECTO = "/tienda/player-icon/20pers.png";
-
 export default function IconoJugador() {
-  const { token, usuario } = useAuth();
-  const [imagen, setImagen] = useState<string>(IMAGEN_POR_DEFECTO);
+  const { token, usuario, cargando } = useAuth();
+  const [imagen, setImagen] = useState<string | null>(null);
   const [titulo, setTitulo] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token || !usuario) {
-      setImagen(IMAGEN_POR_DEFECTO);
+      setImagen(null);
       setTitulo(null);
       return;
     }
@@ -40,32 +40,85 @@ export default function IconoJugador() {
     traerPerfil();
   }, [token, usuario]);
 
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div
+  async function iniciarSesion() {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+    }
+  }
+
+  async function cerrarSesion() {
+    await signOut(auth);
+  }
+
+  if (cargando) {
+    return null;
+  }
+
+  // Deslogueado: solo el botón de login
+  if (!usuario) {
+    return (
+      <button
+        onClick={iniciarSesion}
         className="
-          relative
-          w-32
-          h-32
-          rounded-full
-          overflow-hidden
-          border-2
+          border
           border-purple-400
+          px-6
+          py-3
+          rounded-lg
+          text-purple-200
         "
       >
-        <Image
-          src={imagen}
-          alt="Tu personaje"
-          fill
-          className="object-cover"
-        />
-      </div>
+        Iniciar sesión con Google
+      </button>
+    );
+  }
+
+  // Logueado: imagen del nivel + título + botón de cerrar sesión
+  return (
+    <div className="flex flex-col items-center gap-3">
+      {imagen && (
+        <div
+          className="
+            relative
+            w-32
+            h-32
+            rounded-full
+            overflow-hidden
+            border-2
+            border-purple-400
+          "
+        >
+          <Image
+            src={imagen}
+            alt="Tu personaje"
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
 
       {titulo && (
         <span className="text-sm text-purple-300 text-center">
           {titulo}
         </span>
       )}
+
+      <button
+        onClick={cerrarSesion}
+        className="
+          border
+          border-purple-400
+          px-4
+          py-2
+          rounded-lg
+          text-purple-200
+          text-sm
+        "
+      >
+        Cerrar sesión
+      </button>
     </div>
   );
 }
