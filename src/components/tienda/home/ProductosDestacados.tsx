@@ -1,8 +1,21 @@
 import ProductoCard from "@/components/tienda/ProductoCard";
 import { obtenerProductos } from "@/lib/api";
 
+const ORDEN_RAREZA: Record<string, number> = {
+  legendario: 0,
+  epico: 1,
+  raro: 2,
+  comun: 3,
+};
+
 export default async function ProductosDestacados() {
   const productos = await obtenerProductos();
+
+  const productosOrdenados = [...productos].sort((a: any, b: any) => {
+    const rarezaA = ORDEN_RAREZA[a.rareza] ?? 99;
+    const rarezaB = ORDEN_RAREZA[b.rareza] ?? 99;
+    return rarezaA - rarezaB;
+  });
 
   return (
     <section
@@ -21,7 +34,7 @@ export default async function ProductosDestacados() {
           mb-10
         "
       >
-        Productos Destacados
+        Destacados
       </h2>
 
       <div
@@ -33,7 +46,7 @@ export default async function ProductosDestacados() {
           gap-8
         "
       >
-        {productos.map((producto: any) => (
+        {productosOrdenados.map((producto: any) => (
           <ProductoCard
             key={producto.uuid}
             slug={producto.slug}
