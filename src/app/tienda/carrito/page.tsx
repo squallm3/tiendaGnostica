@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import HeaderNav from "@/components/tienda/HeaderNav";
 import { useCart } from "@/lib/tienda/CartContext";
 
 export default function CarritoPage() {
@@ -9,27 +10,29 @@ export default function CarritoPage() {
 
   if (items.length === 0) {
     return (
-      <main className="min-h-screen bg-black text-white p-6 flex flex-col items-center justify-center gap-6">
-        <h1 className="text-3xl font-bold text-purple-100">
-          Tu carrito está vacío
-        </h1>
-        <Link
-          href="/tienda/categorias"
-          className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
-        >
-          Ver categorías
-        </Link>
+      <main className="min-h-screen bg-black text-white">
+        <HeaderNav titulo="Carrito" />
+
+        <section className="flex flex-col items-center justify-center gap-6 px-6 py-20">
+          <h2 className="text-3xl font-bold text-purple-100 text-center">
+            Tu carrito está vacío
+          </h2>
+          <Link
+            href="/tienda/categorias"
+            className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
+          >
+            Ver categorías
+          </Link>
+        </section>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <section className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-purple-100 mb-8">
-          Carrito
-        </h1>
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo="Carrito" />
 
+      <section className="max-w-4xl mx-auto px-6 pb-10">
         <div className="flex flex-col gap-4">
           {items.map((item) => (
             <div

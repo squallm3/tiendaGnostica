@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import HeaderNav from "@/components/tienda/HeaderNav";
 import { useAuth } from "@/lib/tienda/AuthContext";
 import { obtenerMisPedidos } from "@/lib/api";
 
@@ -55,16 +56,10 @@ export default function PedidosPage() {
   }, [token]);
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <section className="max-w-3xl mx-auto">
-        <Link href="/" className="text-purple-400 text-sm">
-          ← Volver a la tienda
-        </Link>
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo="Mis pedidos" />
 
-        <h1 className="mt-4 text-3xl font-bold text-purple-100 mb-8">
-          Mis pedidos
-        </h1>
-
+      <section className="max-w-3xl mx-auto px-6 pb-10">
         {cargando && <p className="text-purple-300">Cargando...</p>}
 
         {error && <p className="text-red-400">{error}</p>}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import HeaderNav from "@/components/tienda/HeaderNav";
 import RequiereSesion from "@/components/tienda/RequiereSesion";
 import { useAuth } from "@/lib/tienda/AuthContext";
 import { useCart } from "@/lib/tienda/CartContext";
@@ -49,7 +50,6 @@ function FormularioCheckout() {
       if (metodoPago === "mercadopago") {
         const preferencia = await crearPreferenciaPago(token, pedido.id);
         vaciarCarrito();
-        // Redirigimos al checkout de Mercado Pago
         window.location.href = preferencia.initPoint;
         return;
       }
@@ -66,48 +66,57 @@ function FormularioCheckout() {
 
   if (pedidoUuid) {
     return (
-      <main className="min-h-screen bg-black text-white p-6 flex flex-col items-center justify-center gap-6 text-center">
-        <h1 className="text-3xl font-bold text-purple-100">
-          ¡Pedido confirmado!
-        </h1>
-        <p className="text-purple-300">
-          Número de pedido: <span className="text-purple-100">{pedidoUuid}</span>
-        </p>
-        <p className="text-purple-300">
-          Coordinamos el pago en efectivo al momento de la entrega o el retiro.
-        </p>
-        <Link
-          href="/"
-          className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
-        >
-          Volver a la tienda
-        </Link>
+      <main className="min-h-screen bg-black text-white">
+        <HeaderNav titulo="Pedido confirmado" />
+
+        <section className="flex flex-col items-center justify-center gap-6 px-6 py-16 text-center">
+          <h2 className="text-3xl font-bold text-purple-100">
+            ¡Pedido confirmado!
+          </h2>
+          <p className="text-purple-300">
+            Número de pedido:{" "}
+            <span className="text-purple-100">{pedidoUuid}</span>
+          </p>
+          <p className="text-purple-300">
+            Coordinamos el pago en efectivo al momento de la entrega o el
+            retiro.
+          </p>
+          <Link
+            href="/"
+            className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
+          >
+            Volver a la tienda
+          </Link>
+        </section>
       </main>
     );
   }
 
   if (items.length === 0) {
     return (
-      <main className="min-h-screen bg-black text-white p-6 flex flex-col items-center justify-center gap-6">
-        <h1 className="text-3xl font-bold text-purple-100">
-          Tu carrito está vacío
-        </h1>
-        <Link
-          href="/tienda/categorias"
-          className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
-        >
-          Ver categorías
-        </Link>
+      <main className="min-h-screen bg-black text-white">
+        <HeaderNav titulo="Checkout" />
+
+        <section className="flex flex-col items-center justify-center gap-6 px-6 py-20">
+          <h2 className="text-3xl font-bold text-purple-100 text-center">
+            Tu carrito está vacío
+          </h2>
+          <Link
+            href="/tienda/categorias"
+            className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
+          >
+            Ver categorías
+          </Link>
+        </section>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <section className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-purple-100 mb-2">
-          Checkout
-        </h1>
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo="Checkout" />
+
+      <section className="max-w-3xl mx-auto px-6 pb-10">
         <p className="text-purple-300 mb-8">{usuario?.email}</p>
 
         {/* Resumen */}

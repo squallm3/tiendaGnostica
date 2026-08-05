@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import HeaderTienda from "@/components/tienda/categoria/HeaderTienda";
+import HeaderNav from "@/components/tienda/HeaderNav";
 import CategoriaCard from "@/components/tienda/CategoriaCard";
 import { obtenerCategoriasTienda } from "@/lib/tienda/productos";
 
@@ -23,14 +23,10 @@ export default async function CategoriasPage() {
   const categorias = await obtenerCategoriasTienda();
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <HeaderTienda />
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo="Categorías" />
 
-      <section className="max-w-7xl mx-auto mt-10">
-        <h1 className="text-3xl font-bold text-purple-100 mb-8">
-          Categorías
-        </h1>
-
+      <section className="max-w-7xl mx-auto px-6 pb-10">
         {/* BOTON PRODUCTOS DE MI NIVEL */}
 
         <Link

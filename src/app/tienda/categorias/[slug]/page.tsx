@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import HeaderCategoria from "@/components/tienda/categoria/HeaderCategoria";
+import HeaderNav from "@/components/tienda/HeaderNav";
 import MercaderBanner from "@/components/tienda/categoria/MercaderBanner";
 import ProductoCard from "@/components/tienda/ProductoCard";
 import { obtenerCategoriaTienda } from "@/lib/tienda/productos";
@@ -20,13 +20,11 @@ export default async function CategoriaPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <section className="max-w-7xl mx-auto">
-        <HeaderCategoria titulo={categoria.nombre} />
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo={categoria.nombre} />
 
-        <div className="mt-8">
-          <MercaderBanner categoria={categoria.slug} />
-        </div>
+      <section className="max-w-7xl mx-auto px-6 pb-10">
+        <MercaderBanner categoria={categoria.slug} />
 
         {categoria.productos.length === 0 ? (
           <p className="mt-10 text-purple-300">

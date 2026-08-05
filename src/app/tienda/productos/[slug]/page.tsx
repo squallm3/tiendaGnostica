@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import HeaderNav from "@/components/tienda/HeaderNav";
 import CarruselProducto from "@/components/tienda/CarruselProducto";
 import AgregarCarrito from "@/components/tienda/producto/AgregarCarrito";
 import { obtenerProductoTienda } from "@/lib/tienda/productos";
@@ -40,11 +41,15 @@ export default async function ProductoPage({ params }: Props) {
     : Number(producto.precio);
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo={producto.nombre} />
+
       <section
         className="
           max-w-5xl
           mx-auto
+          px-6
+          pb-10
           grid
           grid-cols-1
           md:grid-cols-2
@@ -54,9 +59,9 @@ export default async function ProductoPage({ params }: Props) {
         <CarruselProducto imagenes={imagenes} />
 
         <div>
-          <h1 className="text-3xl font-bold text-purple-100">
+          <h2 className="text-3xl font-bold text-purple-100">
             {producto.nombre}
-          </h1>
+          </h2>
 
           <p className="mt-4 text-purple-200">
             {producto.descripcionCorta ?? "Próximamente disponible."}

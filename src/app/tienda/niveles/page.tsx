@@ -1,4 +1,4 @@
-import Link from "next/link";
+import HeaderNav from "@/components/tienda/HeaderNav";
 import ListaNiveles from "@/components/tienda/niveles/ListaNiveles";
 import { obtenerNivelesConProductos } from "@/lib/api";
 
@@ -6,16 +6,10 @@ export default async function NivelesPage() {
   const niveles = await obtenerNivelesConProductos();
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      <section className="max-w-7xl mx-auto">
-        <Link href="/" className="text-purple-400 text-sm">
-          ← Volver a la tienda
-        </Link>
+    <main className="min-h-screen bg-black text-white">
+      <HeaderNav titulo="Productos de mi nivel" />
 
-        <h1 className="mt-4 text-3xl font-bold text-purple-100 mb-8">
-          Productos de mi nivel
-        </h1>
-
+      <section className="max-w-7xl mx-auto px-6 pb-10">
         <ListaNiveles niveles={niveles} />
       </section>
     </main>
