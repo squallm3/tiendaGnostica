@@ -8,6 +8,7 @@ import {
   crearCategoriaAdmin,
   editarCategoriaAdmin,
   eliminarCategoriaAdmin,
+  reordenarCategoriasAdmin,
   type CategoriaAdmin,
   type CategoriaPayload,
 } from "@/lib/adminApi";
@@ -37,7 +38,6 @@ function FormularioCategoria({
   const [slug, setSlug] = useState(categoria?.slug ?? "");
   const [descripcion, setDescripcion] = useState(categoria?.descripcion ?? "");
   const [icono, setIcono] = useState(categoria?.icono ?? "");
-  const [orden, setOrden] = useState(categoria?.orden ?? 0);
   const [activa, setActiva] = useState(
     categoria ? categoria.activa === 1 : true
   );
@@ -59,7 +59,6 @@ function FormularioCategoria({
         slug: slug.trim(),
         descripcion: descripcion.trim() || null,
         icono: icono.trim() || null,
-        orden: Number(orden) || 0,
         activa,
       });
     } catch (err: any) {
@@ -119,25 +118,13 @@ function FormularioCategoria({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={label}>Ícono (nombre interno)</label>
-              <input
-                className={input}
-                value={icono}
-                onChange={(e) => setIcono(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className={label}>Orden</label>
-              <input
-                type="number"
-                className={input}
-                value={orden}
-                onChange={(e) => setOrden(Number(e.target.value))}
-              />
-            </div>
+          <div>
+            <label className={label}>Ícono (nombre interno)</label>
+            <input
+              className={input}
+              value={icono}
+              onChange={(e) => setIcono(e.target.value)}
+            />
           </div>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -151,6 +138,10 @@ function FormularioCategoria({
               Activa (visible en la tienda)
             </span>
           </label>
+
+          <p className="text-xs text-purple-500">
+            El orden se cambia arrastrando las categorías desde el listado.
+          </p>
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
@@ -183,6 +174,8 @@ export default function AdminCategoriasPage() {
   const [error, setError] = useState<string | null>(null);
   const [editando, setEditando] = useState<CategoriaAdmin | null>(null);
   const [creando, setCreando] = useState(false);
+  const [arrastrando, setArrastrando] = useState<number | null>(null);
+  const [guardandoOrden, setGuardandoOrden] = useState(false);
 
   async function cargar() {
     if (!token) return;
@@ -228,13 +221,44 @@ export default function AdminCategoriasPage() {
     }
   }
 
+  function alSoltar(indiceDestino: number) {
+    if (arrastrando === null || arrastrando === indiceDestino) {
+      setArrastrando(null);
+      return;
+    }
+
+    const copia = [...categorias];
+    const [movida] = copia.splice(arrastrando, 1);
+    copia.splice(indiceDestino, 0, movida);
+
+    // Actualizamos los numeros de orden en pantalla
+    const reordenadas = copia.map((c, i) => ({ ...c, orden: i + 1 }));
+    setCategorias(reordenadas);
+    setArrastrando(null);
+
+    guardarOrden(reordenadas.map((c) => c.id));
+  }
+
+  async function guardarOrden(ids: number[]) {
+    if (!token) return;
+    setGuardandoOrden(true);
+    try {
+      await reordenarCategoriasAdmin(token, ids);
+    } catch (err: any) {
+      alert(err.message || "No se pudo guardar el orden.");
+      await cargar();
+    } finally {
+      setGuardandoOrden(false);
+    }
+  }
+
   return (
     <section className="max-w-4xl mx-auto">
       <Link href="/admin" className="text-purple-400 text-sm">
         ← Volver al panel
       </Link>
 
-      <div className="mt-4 flex items-center justify-between mb-8">
+      <div className="mt-4 flex items-center justify-between mb-2">
         <h1 className="text-3xl font-bold text-purple-100">Categorías</h1>
 
         <button
@@ -245,16 +269,41 @@ export default function AdminCategoriasPage() {
         </button>
       </div>
 
+      <p className="text-sm text-purple-400 mb-6">
+        Arrastrá desde el ícono ☰ para cambiar el orden.
+        {guardandoOrden && (
+          <span className="ml-2 text-purple-300">Guardando orden...</span>
+        )}
+      </p>
+
       {cargando && <p className="text-purple-300">Cargando...</p>}
       {error && <p className="text-red-400">{error}</p>}
 
       <div className="flex flex-col gap-3">
-        {categorias.map((categoria) => (
+        {categorias.map((categoria, indice) => (
           <div
             key={categoria.uuid}
-            className="border border-purple-700 rounded-xl bg-black/40 p-4 flex flex-wrap items-center gap-4"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => alSoltar(indice)}
+            className={`
+              border rounded-xl bg-black/40 p-4 flex flex-wrap items-center gap-4
+              ${arrastrando === indice
+                ? "border-purple-300 opacity-50"
+                : "border-purple-700"}
+            `}
           >
-            <span className="w-10 h-10 shrink-0 rounded-lg border border-purple-700 flex items-center justify-center text-purple-400 text-sm">
+            {/* AGARRE PARA ARRASTRAR */}
+            <div
+              draggable
+              onDragStart={() => setArrastrando(indice)}
+              onDragEnd={() => setArrastrando(null)}
+              className="cursor-grab active:cursor-grabbing text-purple-400 text-xl select-none px-1"
+              title="Arrastrar para reordenar"
+            >
+              ☰
+            </div>
+
+            <span className="w-8 h-8 shrink-0 rounded-lg border border-purple-700 flex items-center justify-center text-purple-400 text-sm">
               {categoria.orden}
             </span>
 

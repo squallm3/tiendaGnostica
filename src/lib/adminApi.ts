@@ -52,7 +52,6 @@ export interface CategoriaPayload {
   slug: string;
   descripcion: string | null;
   icono: string | null;
-  orden: number;
   activa: boolean;
 }
 
@@ -160,6 +159,21 @@ export async function eliminarCategoriaAdmin(token: string, id: number) {
   const respuesta = await fetch(`/api/admin/categorias/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
+  });
+  return manejar(respuesta);
+}
+
+export async function reordenarCategoriasAdmin(
+  token: string,
+  ids: number[]
+) {
+  const respuesta = await fetch("/api/admin/categorias/reordenar", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ ids }),
   });
   return manejar(respuesta);
 }
