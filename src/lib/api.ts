@@ -145,3 +145,17 @@ export async function crearPreferenciaPago(token: string, pedidoId: number) {
 
   return respuesta.json();
 }
+
+export async function obtenerMisPedidos(token: string) {
+  const respuesta = await fetch(`/api/pedidos/mis-pedidos`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudieron obtener los pedidos.");
+  }
+
+  return respuesta.json();
+}
