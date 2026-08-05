@@ -21,7 +21,7 @@ const SECCIONES = [
     descripcion: "Gestionar cuentas y permisos de administración.",
     href: "/admin/usuarios",
     icono: "👤",
-    disponible: false,
+    disponible: true,
   },
 ];
 
