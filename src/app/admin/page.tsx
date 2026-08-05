@@ -13,7 +13,7 @@ const SECCIONES = [
     descripcion: "Crear, editar y ordenar las categorías de la tienda.",
     href: "/admin/categorias",
     icono: "🗂️",
-    disponible: false,
+    disponible: true,
   },
   {
     titulo: "Variantes e imágenes",
