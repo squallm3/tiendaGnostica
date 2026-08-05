@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useAuth } from "@/lib/tienda/AuthContext";
 import type { ProductoAdmin, ProductoPayload } from "@/lib/adminApi";
 
 interface Categoria {
@@ -23,6 +24,8 @@ export default function FormularioProducto({
   onGuardar,
   onCancelar,
 }: Props) {
+  const { token } = useAuth();
+
   const [nombre, setNombre] = useState(producto?.nombre ?? "");
   const [slug, setSlug] = useState(producto?.slug ?? "");
   const [categoriaId, setCategoriaId] = useState(
@@ -55,8 +58,11 @@ export default function FormularioProducto({
     producto?.imagenes?.length ? producto.imagenes : [""]
   );
 
+  const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const inputsArchivo = useRef<(HTMLInputElement | null)[]>([]);
 
   function generarSlug(texto: string) {
     return texto
@@ -81,6 +87,36 @@ export default function FormularioProducto({
   function quitarImagen(indice: number) {
     const copia = imagenes.filter((_, i) => i !== indice);
     setImagenes(copia.length ? copia : [""]);
+  }
+
+  async function subirArchivo(indice: number, archivo: File) {
+    if (!token) return;
+
+    setSubiendo(indice);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("imagen", archivo);
+
+      const respuesta = await fetch("/api/admin/uploads", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(data?.error || "No se pudo subir la imagen");
+      }
+
+      cambiarImagen(indice, data.url);
+    } catch (err: any) {
+      setError(err.message || "No se pudo subir la imagen.");
+    } finally {
+      setSubiendo(null);
+    }
   }
 
   async function guardar() {
@@ -133,7 +169,7 @@ export default function FormularioProducto({
             <p className="text-purple-100 font-bold mb-3">Imágenes</p>
 
             {imagenes.map((url, indice) => (
-              <div key={indice} className="flex gap-3 items-start mb-3">
+              <div key={indice} className="flex gap-3 items-start mb-4">
                 <div className="w-20 h-20 shrink-0 bg-black border border-purple-700 rounded overflow-hidden flex items-center justify-center">
                   {url.trim() ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -156,13 +192,39 @@ export default function FormularioProducto({
                     value={url}
                     onChange={(e) => cambiarImagen(indice, e.target.value)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => quitarImagen(indice)}
-                    className="mt-1 text-xs text-red-400"
-                  >
-                    Quitar
-                  </button>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={(el) => {
+                      inputsArchivo.current[indice] = el;
+                    }}
+                    onChange={(e) => {
+                      const archivo = e.target.files?.[0];
+                      if (archivo) subirArchivo(indice, archivo);
+                      e.target.value = "";
+                    }}
+                  />
+
+                  <div className="flex gap-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => inputsArchivo.current[indice]?.click()}
+                      disabled={subiendo === indice}
+                      className="border border-purple-500 px-3 py-1 rounded-lg text-xs text-purple-200 disabled:opacity-40"
+                    >
+                      {subiendo === indice ? "Subiendo..." : "Explorar..."}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => quitarImagen(indice)}
+                      className="text-xs text-red-400"
+                    >
+                      Quitar
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -176,8 +238,9 @@ export default function FormularioProducto({
             </button>
 
             <p className="mt-3 text-xs text-purple-500">
-              Poné la ruta del archivo dentro de /public, por ejemplo
-              /tienda/mercader/remeras/01.jpg
+              Podés subir un archivo desde tu computadora con Explorar, o
+              escribir la ruta de una imagen que ya esté en el proyecto.
+              Máximo 5 MB.
             </p>
           </div>
 
