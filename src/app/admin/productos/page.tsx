@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/tienda/AuthContext";
 import FormularioProducto from "@/components/admin/FormularioProducto";
+import PanelVariantes from "@/components/admin/PanelVariantes";
 import {
   listarProductosAdmin,
   crearProductoAdmin,
@@ -26,6 +27,7 @@ export default function AdminProductosPage() {
   const [error, setError] = useState<string | null>(null);
   const [editando, setEditando] = useState<ProductoAdmin | null>(null);
   const [creando, setCreando] = useState(false);
+  const [variantesDe, setVariantesDe] = useState<ProductoAdmin | null>(null);
 
   async function cargar() {
     if (!token) return;
@@ -100,7 +102,7 @@ export default function AdminProductosPage() {
       )}
 
       <div className="flex flex-col gap-3">
-        {productos.map((producto) => (
+        {productos.map((producto: any) => (
           <div
             key={producto.uuid}
             className="border border-purple-700 rounded-xl bg-black/40 p-4 flex flex-wrap items-center gap-4"
@@ -133,6 +135,16 @@ export default function AdminProductosPage() {
                 {producto.categoriaNombre} · nivel{" "}
                 {producto.nivelRequerido ?? 1} · stock {producto.stock}
               </p>
+
+              {producto.cantidadVariantes === 0 ? (
+                <p className="text-xs text-amber-400 mt-1">
+                  ⚠ Sin variantes: no se puede comprar
+                </p>
+              ) : (
+                <p className="text-xs text-purple-500 mt-1">
+                  {producto.cantidadVariantes} variante(s)
+                </p>
+              )}
             </div>
 
             <div className="text-right">
@@ -154,7 +166,13 @@ export default function AdminProductosPage() {
               )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setVariantesDe(producto)}
+                className="border border-purple-500 px-3 py-1 rounded-lg text-sm text-purple-200"
+              >
+                Variantes
+              </button>
               <button
                 onClick={() => setEditando(producto)}
                 className="border border-purple-500 px-3 py-1 rounded-lg text-sm text-purple-200"
@@ -180,6 +198,17 @@ export default function AdminProductosPage() {
           onCancelar={() => {
             setCreando(false);
             setEditando(null);
+          }}
+        />
+      )}
+
+      {variantesDe && (
+        <PanelVariantes
+          productoId={variantesDe.id}
+          productoNombre={variantesDe.nombre}
+          onCerrar={() => {
+            setVariantesDe(null);
+            cargar();
           }}
         />
       )}
