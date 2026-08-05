@@ -3,7 +3,8 @@ import Link from "next/link";
 const SECCIONES = [
   {
     titulo: "Productos",
-    descripcion: "Alta, edición, precios y ofertas de los productos.",
+    descripcion:
+      "Alta, edición, precios, ofertas, variantes e imágenes de los productos.",
     href: "/admin/productos",
     icono: "📦",
     disponible: true,
@@ -14,13 +15,6 @@ const SECCIONES = [
     href: "/admin/categorias",
     icono: "🗂️",
     disponible: true,
-  },
-  {
-    titulo: "Variantes e imágenes",
-    descripcion: "Talles, colores, stock e imágenes de cada producto.",
-    href: "/admin/productos",
-    icono: "🎨",
-    disponible: false,
   },
   {
     titulo: "Usuarios",
