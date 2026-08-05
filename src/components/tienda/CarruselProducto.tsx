@@ -14,20 +14,17 @@ export default function CarruselProducto({
 
   const hayImagenes = imagenes && imagenes.length > 0;
 
-  function anterior() {
-    setIndice(
-      indice === 0
-        ? imagenes.length - 1
-        : indice - 1
-    );
+  // Frenamos el click para que no dispare el link que envuelve al carrusel
+  function anterior(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndice(indice === 0 ? imagenes.length - 1 : indice - 1);
   }
 
-  function siguiente() {
-    setIndice(
-      indice === imagenes.length - 1
-        ? 0
-        : indice + 1
-    );
+  function siguiente(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndice(indice === imagenes.length - 1 ? 0 : indice + 1);
   }
 
   return (
@@ -46,9 +43,7 @@ export default function CarruselProducto({
           src={imagenes[indice]}
           alt="Producto"
           fill
-          className="
-            object-contain
-          "
+          className="object-contain"
         />
       ) : (
         <div
@@ -69,12 +64,15 @@ export default function CarruselProducto({
       {hayImagenes && imagenes.length > 1 && (
         <>
           <button
+            type="button"
             onClick={anterior}
+            aria-label="Imagen anterior"
             className="
               absolute
               left-3
               top-1/2
               -translate-y-1/2
+              z-10
 
               bg-black/60
               border
@@ -92,12 +90,15 @@ export default function CarruselProducto({
           </button>
 
           <button
+            type="button"
             onClick={siguiente}
+            aria-label="Imagen siguiente"
             className="
               absolute
               right-3
               top-1/2
               -translate-y-1/2
+              z-10
 
               bg-black/60
               border
@@ -113,6 +114,18 @@ export default function CarruselProducto({
           >
             ›
           </button>
+
+          {/* Indicador de posicion */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
+            {imagenes.map((_, i) => (
+              <span
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full ${
+                  i === indice ? "bg-purple-300" : "bg-purple-700"
+                }`}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
