@@ -25,6 +25,8 @@ interface AuthContextValue {
   cargando: boolean;
   personaje: PersonajeNivel | null;
   nivelUsuario: number;
+  rol: string | null;
+  esAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -33,6 +35,8 @@ const AuthContext = createContext<AuthContextValue>({
   cargando: true,
   personaje: null,
   nivelUsuario: 1,
+  rol: null,
+  esAdmin: false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -40,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
   const [personaje, setPersonaje] = useState<PersonajeNivel | null>(null);
+  const [rol, setRol] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -63,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (respuesta.ok) {
             const perfil = await respuesta.json();
             setPersonaje(perfil?.personaje ?? null);
+            setRol(perfil?.rol ?? null);
           }
         } catch (error) {
           console.error("Error al traer el perfil:", error);
@@ -70,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setToken(null);
         setPersonaje(null);
+        setRol(null);
       }
 
       setCargando(false);
@@ -80,10 +87,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Sin sesion o sin personaje, se considera nivel 1
   const nivelUsuario = personaje?.nivelId ?? 1;
+  const esAdmin = rol === "admin";
 
   return (
     <AuthContext.Provider
-      value={{ usuario, token, cargando, personaje, nivelUsuario }}
+      value={{
+        usuario,
+        token,
+        cargando,
+        personaje,
+        nivelUsuario,
+        rol,
+        esAdmin,
+      }}
     >
       {children}
     </AuthContext.Provider>
