@@ -5,6 +5,11 @@ const API_URL = process.env.API_URL || "http://192.168.1.133:3001/api";
 const BACKEND_URL = API_URL.replace(/\/api\/?$/, "");
 
 const nextConfig: NextConfig = {
+  images: {
+    // Las imagenes subidas se sirven por rewrite desde el backend,
+    // asi que no las pasamos por el optimizador de Next.
+    unoptimized: true,
+  },
   async rewrites() {
     return [
       {
