@@ -34,6 +34,8 @@ export default function ProductoCard({
 
   const nivelNecesario = nivelRequerido ?? 1;
   const bloqueado = nivelNecesario > nivelUsuario;
+  const navegable = Boolean(slug) && !bloqueado;
+  const href = `/tienda/productos/${slug}`;
 
   const hayOferta =
     precioOferta !== null &&
@@ -54,7 +56,14 @@ export default function ProductoCard({
       "
     >
       <div className={bloqueado ? "opacity-30" : ""}>
-        <CarruselProducto imagenes={imagenes} />
+        {/* IMAGEN */}
+        {navegable ? (
+          <Link href={href} className="block">
+            <CarruselProducto imagenes={imagenes} />
+          </Link>
+        ) : (
+          <CarruselProducto imagenes={imagenes} />
+        )}
 
         {categoriaNombre && (
           <p className="mt-4 text-xs uppercase tracking-wide text-purple-400">
@@ -62,9 +71,18 @@ export default function ProductoCard({
           </p>
         )}
 
-        <h3 className="mt-1 text-xl font-bold text-purple-100">
-          {nombre}
-        </h3>
+        {/* NOMBRE */}
+        {navegable ? (
+          <Link href={href}>
+            <h3 className="mt-1 text-xl font-bold text-purple-100 hover:text-purple-300 transition">
+              {nombre}
+            </h3>
+          </Link>
+        ) : (
+          <h3 className="mt-1 text-xl font-bold text-purple-100">
+            {nombre}
+          </h3>
+        )}
 
         <p className="mt-2 text-purple-200">{descripcion}</p>
 
@@ -95,7 +113,7 @@ export default function ProductoCard({
         </div>
       ) : slug ? (
         <Link
-          href={`/tienda/productos/${slug}`}
+          href={href}
           className="
             mt-4
             block
