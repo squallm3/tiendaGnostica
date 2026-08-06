@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const NUMERO_WHATSAPP = "5491131409281";
+const NUMERO_WHATSAPP = "5491134126968";
 const MENSAJE = "Hola! Te escribo desde la tienda de los Haikus Gnosticos.";
 
 export default function BotonWhatsApp() {
