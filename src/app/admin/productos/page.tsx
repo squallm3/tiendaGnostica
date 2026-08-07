@@ -10,6 +10,7 @@ import {
   crearProductoAdmin,
   editarProductoAdmin,
   eliminarProductoAdmin,
+  editarProductosMasivo,
   type ProductoAdmin,
   type ProductoPayload,
 } from "@/lib/adminApi";
@@ -17,6 +18,128 @@ import {
 interface Categoria {
   id: number;
   nombre: string;
+}
+
+function BarraMasiva({
+  cantidad,
+  onLimpiar,
+  onAplicar,
+}: {
+  cantidad: number;
+  onLimpiar: () => void;
+  onAplicar: (payload: {
+    precio: number | null;
+    aplicarOferta: boolean;
+    precioOferta: number | null;
+  }) => Promise<void>;
+}) {
+  const [precio, setPrecio] = useState("");
+  const [aplicarOferta, setAplicarOferta] = useState(false);
+  const [precioOferta, setPrecioOferta] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function aplicar() {
+    if (!precio.trim() && !aplicarOferta) {
+      setError(
+        "Cargá un precio, o activá 'Aplicar oferta' con su valor, para saber qué cambiar."
+      );
+      return;
+    }
+
+    if (aplicarOferta && !precioOferta.trim()) {
+      setError("Falta el precio de oferta.");
+      return;
+    }
+
+    setGuardando(true);
+    setError(null);
+
+    try {
+      await onAplicar({
+        precio: precio.trim() ? Number(precio) : null,
+        aplicarOferta,
+        precioOferta: aplicarOferta ? Number(precioOferta) : null,
+      });
+      setPrecio("");
+      setAplicarOferta(false);
+      setPrecioOferta("");
+    } catch (err: any) {
+      setError(err.message || "No se pudo aplicar el cambio.");
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  const input =
+    "bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 placeholder-purple-600 outline-none text-sm w-32";
+
+  return (
+    <div className="sticky top-0 z-30 mb-6 border border-purple-400 bg-black rounded-xl p-4 flex flex-wrap items-center gap-4">
+      <span className="text-purple-100 font-bold">
+        {cantidad} seleccionado(s)
+      </span>
+
+      <div>
+        <label className="text-xs text-purple-400 block mb-1">
+          Precio nuevo
+        </label>
+        <input
+          type="number"
+          placeholder="Sin cambios"
+          className={input}
+          value={precio}
+          onChange={(e) => setPrecio(e.target.value)}
+        />
+      </div>
+
+      <label className="flex items-center gap-2 cursor-pointer mt-4">
+        <input
+          type="checkbox"
+          checked={aplicarOferta}
+          onChange={(e) => setAplicarOferta(e.target.checked)}
+          className="w-4 h-4"
+        />
+        <span className="text-sm text-purple-200">Aplicar oferta</span>
+      </label>
+
+      {aplicarOferta ? (
+        <div>
+          <label className="text-xs text-purple-400 block mb-1">
+            Precio de oferta
+          </label>
+          <input
+            type="number"
+            className={input}
+            value={precioOferta}
+            onChange={(e) => setPrecioOferta(e.target.value)}
+          />
+        </div>
+      ) : (
+        <p className="text-xs text-purple-500 max-w-[180px]">
+          Sin marcar, se les quita la oferta a los seleccionados.
+        </p>
+      )}
+
+      {error && <p className="text-red-400 text-sm w-full">{error}</p>}
+
+      <div className="flex gap-2 ml-auto">
+        <button
+          onClick={aplicar}
+          disabled={guardando}
+          className="border border-purple-400 px-4 py-2 rounded-lg text-sm text-purple-200 disabled:opacity-40"
+        >
+          {guardando ? "Aplicando..." : "Aplicar a selección"}
+        </button>
+        <button
+          onClick={onLimpiar}
+          className="px-4 py-2 rounded-lg text-sm text-purple-400"
+        >
+          Cancelar selección
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function AdminProductosPage() {
@@ -28,6 +151,7 @@ export default function AdminProductosPage() {
   const [editando, setEditando] = useState<ProductoAdmin | null>(null);
   const [creando, setCreando] = useState(false);
   const [variantesDe, setVariantesDe] = useState<ProductoAdmin | null>(null);
+  const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
 
   async function cargar() {
     if (!token) return;
@@ -77,6 +201,32 @@ export default function AdminProductosPage() {
     }
   }
 
+  function alternarSeleccion(id: number) {
+    const copia = new Set(seleccionados);
+    if (copia.has(id)) {
+      copia.delete(id);
+    } else {
+      copia.add(id);
+    }
+    setSeleccionados(copia);
+  }
+
+  async function aplicarMasivo(payload: {
+    precio: number | null;
+    aplicarOferta: boolean;
+    precioOferta: number | null;
+  }) {
+    if (!token) return;
+
+    await editarProductosMasivo(token, {
+      ids: Array.from(seleccionados),
+      ...payload,
+    });
+
+    setSeleccionados(new Set());
+    await cargar();
+  }
+
   return (
     <section className="max-w-6xl mx-auto">
       <Link href="/admin" className="text-purple-400 text-sm">
@@ -94,6 +244,14 @@ export default function AdminProductosPage() {
         </button>
       </div>
 
+      {seleccionados.size > 0 && (
+        <BarraMasiva
+          cantidad={seleccionados.size}
+          onLimpiar={() => setSeleccionados(new Set())}
+          onAplicar={aplicarMasivo}
+        />
+      )}
+
       {cargando && <p className="text-purple-300">Cargando...</p>}
       {error && <p className="text-red-400">{error}</p>}
 
@@ -107,6 +265,13 @@ export default function AdminProductosPage() {
             key={producto.uuid}
             className="border border-purple-700 rounded-xl bg-black/40 p-4 flex flex-wrap items-center gap-4"
           >
+            <input
+              type="checkbox"
+              checked={seleccionados.has(producto.id)}
+              onChange={() => alternarSeleccion(producto.id)}
+              className="w-5 h-5 shrink-0"
+            />
+
             {/* MINIATURA */}
             <div className="w-20 h-20 shrink-0 bg-black border border-purple-700 rounded-lg overflow-hidden flex items-center justify-center">
               {producto.imagenes?.[0] ? (

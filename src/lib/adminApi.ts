@@ -55,6 +55,13 @@ export interface CategoriaPayload {
   activa: boolean;
 }
 
+export interface EdicionMasivaPayload {
+  ids: number[];
+  precio: number | null;
+  aplicarOferta: boolean;
+  precioOferta: number | null;
+}
+
 async function manejar(respuesta: Response) {
   const data = await respuesta.json();
   if (!respuesta.ok) {
@@ -109,6 +116,21 @@ export async function eliminarProductoAdmin(token: string, id: number) {
   const respuesta = await fetch(`/api/admin/productos/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
+  });
+  return manejar(respuesta);
+}
+
+export async function editarProductosMasivo(
+  token: string,
+  payload: EdicionMasivaPayload
+) {
+  const respuesta = await fetch("/api/admin/productos/masivo", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
   });
   return manejar(respuesta);
 }
