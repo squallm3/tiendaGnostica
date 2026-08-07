@@ -211,6 +211,17 @@ export default function AdminProductosPage() {
     setSeleccionados(copia);
   }
 
+  const todosSeleccionados =
+    productos.length > 0 && seleccionados.size === productos.length;
+
+  function alternarTodos() {
+    if (todosSeleccionados) {
+      setSeleccionados(new Set());
+    } else {
+      setSeleccionados(new Set(productos.map((p) => p.id)));
+    }
+  }
+
   async function aplicarMasivo(payload: {
     precio: number | null;
     aplicarOferta: boolean;
@@ -233,7 +244,7 @@ export default function AdminProductosPage() {
         ← Volver al panel
       </Link>
 
-      <div className="mt-4 flex items-center justify-between mb-8">
+      <div className="mt-4 flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold text-purple-100">Productos</h1>
 
         <button
@@ -243,6 +254,20 @@ export default function AdminProductosPage() {
           + Nuevo producto
         </button>
       </div>
+
+      {productos.length > 0 && (
+        <label className="flex items-center gap-2 cursor-pointer mb-6 w-fit">
+          <input
+            type="checkbox"
+            checked={todosSeleccionados}
+            onChange={alternarTodos}
+            className="w-5 h-5"
+          />
+          <span className="text-sm text-purple-300">
+            Seleccionar todos ({productos.length})
+          </span>
+        </label>
+      )}
 
       {seleccionados.size > 0 && (
         <BarraMasiva
