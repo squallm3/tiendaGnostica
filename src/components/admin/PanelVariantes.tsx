@@ -17,6 +17,7 @@ interface Props {
 }
 
 interface FilaEdicion {
+  esUnica: boolean;
   talle: string;
   color: string;
   stock: number;
@@ -25,6 +26,7 @@ interface FilaEdicion {
 }
 
 const FILA_VACIA: FilaEdicion = {
+  esUnica: true,
   talle: "",
   color: "",
   stock: 0,
@@ -71,7 +73,9 @@ export default function PanelVariantes({
   function empezarEdicion(variante: VarianteAdmin) {
     setCreando(false);
     setEditandoId(variante.id);
+    const esUnica = !variante.talle && !variante.color;
     setFila({
+      esUnica,
       talle: variante.talle ?? "",
       color: variante.color ?? "",
       stock: variante.stock,
@@ -90,8 +94,10 @@ export default function PanelVariantes({
   async function guardar() {
     if (!token) return;
 
-    if (!fila.talle.trim() && !fila.color.trim()) {
-      setError("Poné al menos un talle o un color para identificar la variante.");
+    if (!fila.esUnica && !fila.talle.trim() && !fila.color.trim()) {
+      setError(
+        "Poné al menos un talle o un color, o marcá 'Variante única'."
+      );
       return;
     }
 
@@ -99,8 +105,8 @@ export default function PanelVariantes({
     setError(null);
 
     const payload = {
-      talle: fila.talle.trim() || null,
-      color: fila.color.trim() || null,
+      talle: fila.esUnica ? null : fila.talle.trim() || null,
+      color: fila.esUnica ? null : fila.color.trim() || null,
       stock: Number(fila.stock) || 0,
       precioExtra: Number(fila.precioExtra) || 0,
       sku: fila.sku.trim() || null,
@@ -137,7 +143,7 @@ export default function PanelVariantes({
   }
 
   const input =
-    "w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 placeholder-purple-600 outline-none text-sm";
+    "w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 placeholder-purple-600 outline-none text-sm disabled:opacity-30 disabled:cursor-not-allowed";
   const label = "text-xs text-purple-400 mb-1 block";
 
   return (
@@ -154,7 +160,8 @@ export default function PanelVariantes({
           <div className="border border-amber-700 bg-amber-950/30 rounded-lg p-4 mb-4">
             <p className="text-amber-300 text-sm">
               Este producto no tiene variantes. Sin al menos una, no se puede
-              agregar al carrito ni comprar.
+              agregar al carrito ni comprar. Podés agregar una marcando
+              "Variante única" si no maneja talle ni color.
             </p>
           </div>
         )}
@@ -220,6 +227,25 @@ export default function PanelVariantes({
               {editandoId ? "Editar variante" : "Nueva variante"}
             </p>
 
+            <label className="flex items-center gap-3 cursor-pointer mb-4">
+              <input
+                type="checkbox"
+                checked={fila.esUnica}
+                onChange={(e) =>
+                  setFila({
+                    ...fila,
+                    esUnica: e.target.checked,
+                    talle: e.target.checked ? "" : fila.talle,
+                    color: e.target.checked ? "" : fila.color,
+                  })
+                }
+                className="w-4 h-4"
+              />
+              <span className="text-purple-200 text-sm">
+                Variante única (sin talle ni color)
+              </span>
+            </label>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div>
                 <label className={label}>Talle</label>
@@ -227,6 +253,7 @@ export default function PanelVariantes({
                   className={input}
                   placeholder="S, M, L..."
                   value={fila.talle}
+                  disabled={fila.esUnica}
                   onChange={(e) => setFila({ ...fila, talle: e.target.value })}
                 />
               </div>
@@ -237,6 +264,7 @@ export default function PanelVariantes({
                   className={input}
                   placeholder="Negro, Violeta..."
                   value={fila.color}
+                  disabled={fila.esUnica}
                   onChange={(e) => setFila({ ...fila, color: e.target.value })}
                 />
               </div>
