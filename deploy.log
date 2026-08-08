@@ -1,0 +1,138 @@
+ Image hk-store-web Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.03kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.00kB 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/node:24-alpine
+#3 DONE 1.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 75B 0.0s done
+#4 DONE 0.1s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [1/6] FROM docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#6 resolve docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43
+#6 resolve docker.io/library/node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 0.1s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 1.43MB 0.2s done
+#5 DONE 0.3s
+
+#7 [2/6] WORKDIR /app
+#7 CACHED
+
+#8 [3/6] COPY package*.json ./
+#8 CACHED
+
+#9 [4/6] RUN npm install
+#9 CACHED
+
+#10 [5/6] COPY . .
+#10 DONE 28.3s
+
+#11 [6/6] RUN npm run build
+#11 5.194 
+#11 5.194 > haikusgnosticos@0.1.0 build
+#11 5.194 > next build
+#11 5.194 
+#11 10.24 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#11 10.25 This information is used to shape Next.js' roadmap and prioritize features.
+#11 10.25 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#11 10.25 https://nextjs.org/telemetry
+#11 10.25 
+#11 10.35 ▲ Next.js 16.2.4 (Turbopack)
+#11 10.35 
+#11 10.59   Creating an optimized production build ...
+#11 103.7 ✓ Compiled successfully in 64s
+#11 103.7   Running TypeScript ...
+#11 147.4   Finished TypeScript in 44s ...
+#11 147.4   Collecting page data using 3 workers ...
+#11 151.2   Generating static pages using 3 workers (0/32) ...
+#11 151.6 Error al obtener los más vendidos: Error: Dynamic server usage: Route / couldn't be rendered statically because it used no-store fetch http://192.168.1.133:3001/api/productos/mas-vendidos?limite=4 /. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+#11 151.6     at ei (.next/server/chunks/[root-of-the-server]__0j8-xkl._.js:1:40982)
+#11 151.6     at <unknown> (.next/server/chunks/[root-of-the-server]__0j8-xkl._.js:1:70891)
+#11 151.6     at <unknown> (.next/server/chunks/[root-of-the-server]__0j8-xkl._.js:1:37496)
+#11 151.6     at <unknown> (.next/server/chunks/[root-of-the-server]__0j8-xkl._.js:1:37041) {
+#11 151.6   description: "Route / couldn't be rendered statically because it used no-store fetch http://192.168.1.133:3001/api/productos/mas-vendidos?limite=4 /. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+#11 151.6   digest: 'DYNAMIC_SERVER_USAGE'
+#11 151.6 }
+#11 152.7   Generating static pages using 3 workers (8/32) 
+#11 152.8   Generating static pages using 3 workers (16/32) 
+#11 152.9   Generating static pages using 3 workers (24/32) 
+#11 153.4 ✓ Generating static pages using 3 workers (32/32) in 2.2s
+#11 153.5   Finalizing page optimization ...
+#11 153.5 
+#11 153.6 Route (app)
+#11 153.6 ┌ ƒ /
+#11 153.6 ├ ○ /_not-found
+#11 153.6 ├ ○ /admin
+#11 153.6 ├ ○ /admin/categorias
+#11 153.6 ├ ƒ /admin/categorias/reordenar
+#11 153.6 ├ ○ /admin/productos
+#11 153.6 ├ ƒ /admin/productos/masivo
+#11 153.6 ├ ○ /admin/usuarios
+#11 153.6 ├ ƒ /api/admin/categorias
+#11 153.6 ├ ƒ /api/admin/categorias/[id]
+#11 153.6 ├ ƒ /api/admin/productos
+#11 153.6 ├ ƒ /api/admin/productos/[id]
+#11 153.6 ├ ƒ /api/admin/uploads
+#11 153.6 ├ ƒ /api/admin/usuarios
+#11 153.6 ├ ƒ /api/admin/usuarios/[id]
+#11 153.6 ├ ƒ /api/admin/usuarios/[id]/activo
+#11 153.6 ├ ƒ /api/admin/variantes
+#11 153.6 ├ ƒ /api/admin/variantes/[id]
+#11 153.6 ├ ƒ /api/newsletter
+#11 153.6 ├ ƒ /api/pagos/preferencia
+#11 153.6 ├ ƒ /api/pedidos
+#11 153.6 ├ ƒ /api/pedidos/mis-pedidos
+#11 153.6 ├ ƒ /api/usuarios/perfil
+#11 153.6 ├ ƒ /api/usuarios/sync
+#11 153.6 ├ ƒ /feed/productos.csv
+#11 153.6 ├ ƒ /producto/[uuid]
+#11 153.6 ├ ○ /tienda/carrito
+#11 153.6 ├ ƒ /tienda/categorias
+#11 153.6 ├ ƒ /tienda/categorias/[slug]
+#11 153.6 ├ ○ /tienda/checkout
+#11 153.6 ├ ƒ /tienda/niveles
+#11 153.6 ├ ○ /tienda/pago/error
+#11 153.6 ├ ○ /tienda/pago/exito
+#11 153.6 ├ ○ /tienda/pago/pendiente
+#11 153.6 ├ ○ /tienda/perfil
+#11 153.6 ├ ○ /tienda/perfil/configuracion
+#11 153.6 ├ ○ /tienda/perfil/inventario
+#11 153.6 ├ ○ /tienda/perfil/pedidos
+#11 153.6 └ ƒ /tienda/productos/[slug]
+#11 153.6 
+#11 153.6 
+#11 153.6 ○  (Static)   prerendered as static content
+#11 153.6 ƒ  (Dynamic)  server-rendered on demand
+#11 153.6 
+#11 DONE 156.4s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 36.3s done
+#12 exporting manifest sha256:629d62583fd2a88f37e4d1741a43f802d4739f8582d38b85a4bcefe711b1e3b5 0.1s done
+#12 exporting config sha256:2da7f050812f61c107829faa3efd82d06b4387eaea401305879f15ba988f9567 0.0s done
+#12 exporting attestation manifest sha256:cebec55f8311aa53065d93502e20de16ecbd353ed410b7ffa22096ed345c6044 0.1s done
+#12 exporting manifest list sha256:83c668b0805065577217f36560c7071e104f6395113bf582f0ee89362b2d3147 0.0s done
+#12 naming to docker.io/library/hk-store-web:latest 0.0s done
+#12 unpacking to docker.io/library/hk-store-web:latest
+#12 unpacking to docker.io/library/hk-store-web:latest 18.5s done
+#12 DONE 55.4s
+
+#13 resolving provenance for metadata file
+#13 DONE 0.2s
+ Image hk-store-web Built 
+ Container hk-store-web Recreate 
+ Container hk-store-web Recreated 
+ Container hk-store-web Starting 
+ Container hk-store-web Started 
