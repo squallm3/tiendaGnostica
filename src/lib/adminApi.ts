@@ -13,9 +13,10 @@ export interface ProductoAdmin {
   nivelRequerido: number | null;
   rareza: string;
   peso: string | null;
-  stock: number;
   activo: number;
   imagenes: string[];
+  cantidadVariantes?: number;
+  stockVariantes?: number;
 }
 
 export interface ProductoPayload {
@@ -30,7 +31,6 @@ export interface ProductoPayload {
   nivelRequerido: number;
   rareza: string;
   peso: number | null;
-  stock: number;
   activo: boolean;
   imagenes: string[];
 }

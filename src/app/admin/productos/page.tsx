@@ -323,7 +323,8 @@ export default function AdminProductosPage() {
               <p className="text-xs text-purple-500">/{producto.slug}</p>
               <p className="text-xs text-purple-400 mt-1">
                 {producto.categoriaNombre} · nivel{" "}
-                {producto.nivelRequerido ?? 1} · stock {producto.stock}
+                {producto.nivelRequerido ?? 1} · stock{" "}
+                {producto.stockVariantes ?? 0}
               </p>
 
               {producto.cantidadVariantes === 0 ? (

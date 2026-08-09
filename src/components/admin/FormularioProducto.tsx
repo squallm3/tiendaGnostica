@@ -49,7 +49,6 @@ export default function FormularioProducto({
     producto?.nivelRequerido ?? 1
   );
   const [rareza, setRareza] = useState(producto?.rareza ?? "comun");
-  const [stock, setStock] = useState(producto?.stock ?? 0);
   const [peso, setPeso] = useState(producto?.peso ?? "");
   const [activo, setActivo] = useState(
     producto ? producto.activo === 1 : true
@@ -141,7 +140,6 @@ export default function FormularioProducto({
         nivelRequerido: esGeneral ? 1 : Number(nivelRequerido),
         rareza,
         peso: peso ? Number(peso) : null,
-        stock: Number(stock) || 0,
         activo,
         imagenes: imagenes.map((i) => i.trim()).filter(Boolean),
       });
@@ -381,7 +379,7 @@ export default function FormularioProducto({
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={label}>Rareza</label>
               <select
@@ -398,16 +396,6 @@ export default function FormularioProducto({
             </div>
 
             <div>
-              <label className={label}>Stock</label>
-              <input
-                type="number"
-                className={input}
-                value={stock}
-                onChange={(e) => setStock(Number(e.target.value))}
-              />
-            </div>
-
-            <div>
               <label className={label}>Peso (kg)</label>
               <input
                 type="number"
@@ -417,6 +405,11 @@ export default function FormularioProducto({
               />
             </div>
           </div>
+
+          <p className="text-xs text-purple-500 -mt-2">
+            El stock se maneja desde "Variantes", después de guardar este
+            producto.
+          </p>
 
           <label className="flex items-center gap-3 cursor-pointer">
             <input
