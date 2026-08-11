@@ -56,6 +56,7 @@ export default function FormularioProducto({
   const [imagenes, setImagenes] = useState<string[]>(
     producto?.imagenes?.length ? producto.imagenes : [""]
   );
+  const [videoUrl, setVideoUrl] = useState((producto as any)?.videoUrl ?? "");
 
   const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
@@ -142,6 +143,7 @@ export default function FormularioProducto({
         peso: peso ? Number(peso) : null,
         activo,
         imagenes: imagenes.map((i) => i.trim()).filter(Boolean),
+        videoUrl: videoUrl.trim() || null,
       });
     } catch (err: any) {
       setError(err.message || "No se pudo guardar.");
@@ -239,6 +241,21 @@ export default function FormularioProducto({
               Podés subir un archivo desde tu computadora con Explorar, o
               escribir la ruta de una imagen que ya esté en el proyecto.
               Máximo 5 MB.
+            </p>
+          </div>
+
+          {/* VIDEO DE YOUTUBE */}
+          <div className="border border-purple-700 rounded-lg p-4">
+            <label className={label}>Video de YouTube (opcional)</label>
+            <input
+              className={input}
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+            />
+            <p className="mt-2 text-xs text-purple-500">
+              Si lo cargás, aparece como el último slide del carrusel de
+              este producto, después de todas las fotos.
             </p>
           </div>
 
