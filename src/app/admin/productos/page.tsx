@@ -1,57 +1,127 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRef, useState } from "react";
 import { useAuth } from "@/lib/tienda/AuthContext";
-import FormularioProducto from "@/components/admin/FormularioProducto";
-import PanelVariantes from "@/components/admin/PanelVariantes";
-import {
-  listarProductosAdmin,
-  crearProductoAdmin,
-  editarProductoAdmin,
-  eliminarProductoAdmin,
-  editarProductosMasivo,
-  alternarDestacado,
-  type ProductoAdmin,
-  type ProductoPayload,
-} from "@/lib/adminApi";
+import type { ProductoAdmin, ProductoPayload } from "@/lib/adminApi";
 
 interface Categoria {
   id: number;
   nombre: string;
 }
 
-const LIMITE_DESTACADOS = 9;
+interface Props {
+  producto: ProductoAdmin | null;
+  categorias: Categoria[];
+  onGuardar: (payload: ProductoPayload) => Promise<void>;
+  onCancelar: () => void;
+}
 
-function BarraMasiva({
-  cantidad,
-  onLimpiar,
-  onAplicar,
-}: {
-  cantidad: number;
-  onLimpiar: () => void;
-  onAplicar: (payload: {
-    precio: number | null;
-    aplicarOferta: boolean;
-    precioOferta: number | null;
-  }) => Promise<void>;
-}) {
-  const [precio, setPrecio] = useState("");
-  const [aplicarOferta, setAplicarOferta] = useState(false);
-  const [precioOferta, setPrecioOferta] = useState("");
+const RAREZAS = ["comun", "raro", "epico", "legendario"];
+
+export default function FormularioProducto({
+  producto,
+  categorias,
+  onGuardar,
+  onCancelar,
+}: Props) {
+  const { token } = useAuth();
+
+  const [nombre, setNombre] = useState(producto?.nombre ?? "");
+  const [slug, setSlug] = useState(producto?.slug ?? "");
+  const [categoriaId, setCategoriaId] = useState(
+    producto?.categoriaId ?? categorias[0]?.id ?? 1
+  );
+  const [descripcionCorta, setDescripcionCorta] = useState(
+    producto?.descripcionCorta ?? ""
+  );
+  const [descripcionLarga, setDescripcionLarga] = useState(
+    producto?.descripcionLarga ?? ""
+  );
+  const [lore, setLore] = useState(producto?.lore ?? "");
+  const [precio, setPrecio] = useState(producto?.precio ?? "");
+  const [precioOferta, setPrecioOferta] = useState(
+    producto?.precioOferta ?? ""
+  );
+  const [esGeneral, setEsGeneral] = useState(
+    producto ? (producto.nivelRequerido ?? 1) === 1 : true
+  );
+  const [nivelRequerido, setNivelRequerido] = useState(
+    producto?.nivelRequerido ?? 1
+  );
+  const [rareza, setRareza] = useState(producto?.rareza ?? "comun");
+  const [peso, setPeso] = useState(producto?.peso ?? "");
+  const [activo, setActivo] = useState(
+    producto ? producto.activo === 1 : true
+  );
+  const [imagenes, setImagenes] = useState<string[]>(
+    producto?.imagenes?.length ? producto.imagenes : [""]
+  );
+  const [videoUrl, setVideoUrl] = useState((producto as any)?.videoUrl ?? "");
+
+  const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function aplicar() {
-    if (!precio.trim() && !aplicarOferta) {
-      setError(
-        "Cargá un precio, o activá 'Aplicar oferta' con su valor, para saber qué cambiar."
-      );
-      return;
-    }
+  const inputsArchivo = useRef<(HTMLInputElement | null)[]>([]);
 
-    if (aplicarOferta && !precioOferta.trim()) {
-      setError("Falta el precio de oferta.");
+  function generarSlug(texto: string) {
+    return texto
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+  }
+
+  function cambiarImagen(indice: number, valor: string) {
+    const copia = [...imagenes];
+    copia[indice] = valor;
+    setImagenes(copia);
+  }
+
+  function agregarImagen() {
+    setImagenes([...imagenes, ""]);
+  }
+
+  function quitarImagen(indice: number) {
+    const copia = imagenes.filter((_, i) => i !== indice);
+    setImagenes(copia.length ? copia : [""]);
+  }
+
+  async function subirArchivo(indice: number, archivo: File) {
+    if (!token) return;
+
+    setSubiendo(indice);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("imagen", archivo);
+
+      const respuesta = await fetch("/api/admin/uploads", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(data?.error || "No se pudo subir la imagen");
+      }
+
+      cambiarImagen(indice, data.url);
+    } catch (err: any) {
+      setError(err.message || "No se pudo subir la imagen.");
+    } finally {
+      setSubiendo(null);
+    }
+  }
+
+  async function guardar() {
+    if (!nombre.trim() || !slug.trim()) {
+      setError("El nombre y el slug son obligatorios.");
       return;
     }
 
@@ -59,394 +129,337 @@ function BarraMasiva({
     setError(null);
 
     try {
-      await onAplicar({
-        precio: precio.trim() ? Number(precio) : null,
-        aplicarOferta,
-        precioOferta: aplicarOferta ? Number(precioOferta) : null,
+      await onGuardar({
+        categoriaId: Number(categoriaId),
+        nombre: nombre.trim(),
+        slug: slug.trim(),
+        descripcionCorta: descripcionCorta.trim() || null,
+        descripcionLarga: descripcionLarga.trim() || null,
+        lore: lore.trim() || null,
+        precio: Number(precio) || 0,
+        precioOferta: precioOferta ? Number(precioOferta) : null,
+        nivelRequerido: esGeneral ? 1 : Number(nivelRequerido),
+        rareza,
+        peso: peso ? Number(peso) : null,
+        activo,
+        imagenes: imagenes.map((i) => i.trim()).filter(Boolean),
+        videoUrl: videoUrl.trim() || null,
       });
-      setPrecio("");
-      setAplicarOferta(false);
-      setPrecioOferta("");
     } catch (err: any) {
-      setError(err.message || "No se pudo aplicar el cambio.");
+      setError(err.message || "No se pudo guardar.");
     } finally {
       setGuardando(false);
     }
   }
 
   const input =
-    "bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 placeholder-purple-600 outline-none text-sm w-32";
+    "w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 placeholder-purple-600 outline-none";
+  const label = "text-sm text-purple-300 mb-1 block";
 
   return (
-    <div className="sticky top-0 z-30 mb-6 border border-purple-400 bg-black rounded-xl p-4 flex flex-wrap items-center gap-4">
-      <span className="text-purple-100 font-bold">
-        {cantidad} seleccionado(s)
-      </span>
+    <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-6">
+      <div className="max-w-2xl mx-auto border border-purple-500 rounded-xl bg-black p-6">
+        <h2 className="text-2xl font-bold text-purple-100 mb-6">
+          {producto ? "Editar producto" : "Nuevo producto"}
+        </h2>
 
-      <div>
-        <label className="text-xs text-purple-400 block mb-1">
-          Precio nuevo
-        </label>
-        <input
-          type="number"
-          placeholder="Sin cambios"
-          className={input}
-          value={precio}
-          onChange={(e) => setPrecio(e.target.value)}
-        />
-      </div>
+        <div className="flex flex-col gap-4">
+          {/* IMAGENES */}
+          <div className="border border-purple-700 rounded-lg p-4">
+            <p className="text-purple-100 font-bold mb-3">Imágenes</p>
 
-      <label className="flex items-center gap-2 cursor-pointer mt-4">
-        <input
-          type="checkbox"
-          checked={aplicarOferta}
-          onChange={(e) => setAplicarOferta(e.target.checked)}
-          className="w-4 h-4"
-        />
-        <span className="text-sm text-purple-200">Aplicar oferta</span>
-      </label>
+            {imagenes.map((url, indice) => (
+              <div key={indice} className="flex gap-3 items-start mb-4">
+                <div className="w-20 h-20 shrink-0 bg-black border border-purple-700 rounded overflow-hidden flex items-center justify-center">
+                  {url.trim() ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={url}
+                      alt="Vista previa"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-[10px] text-purple-600 text-center px-1">
+                      Sin imagen
+                    </span>
+                  )}
+                </div>
 
-      {aplicarOferta ? (
-        <div>
-          <label className="text-xs text-purple-400 block mb-1">
-            Precio de oferta
-          </label>
-          <input
-            type="number"
-            className={input}
-            value={precioOferta}
-            onChange={(e) => setPrecioOferta(e.target.value)}
-          />
-        </div>
-      ) : (
-        <p className="text-xs text-purple-500 max-w-[180px]">
-          Sin marcar, se les quita la oferta a los seleccionados.
-        </p>
-      )}
+                <div className="flex-1">
+                  <input
+                    className={input}
+                    placeholder="/tienda/mercader/remeras/01.jpg"
+                    value={url}
+                    onChange={(e) => cambiarImagen(indice, e.target.value)}
+                  />
 
-      {error && <p className="text-red-400 text-sm w-full">{error}</p>}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={(el) => {
+                      inputsArchivo.current[indice] = el;
+                    }}
+                    onChange={(e) => {
+                      const archivo = e.target.files?.[0];
+                      if (archivo) subirArchivo(indice, archivo);
+                      e.target.value = "";
+                    }}
+                  />
 
-      <div className="flex gap-2 ml-auto">
-        <button
-          onClick={aplicar}
-          disabled={guardando}
-          className="border border-purple-400 px-4 py-2 rounded-lg text-sm text-purple-200 disabled:opacity-40"
-        >
-          {guardando ? "Aplicando..." : "Aplicar a selección"}
-        </button>
-        <button
-          onClick={onLimpiar}
-          className="px-4 py-2 rounded-lg text-sm text-purple-400"
-        >
-          Cancelar selección
-        </button>
-      </div>
-    </div>
-  );
-}
+                  <div className="flex gap-3 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => inputsArchivo.current[indice]?.click()}
+                      disabled={subiendo === indice}
+                      className="border border-purple-500 px-3 py-1 rounded-lg text-xs text-purple-200 disabled:opacity-40"
+                    >
+                      {subiendo === indice ? "Subiendo..." : "Explorar..."}
+                    </button>
 
-export default function AdminProductosPage() {
-  const { token } = useAuth();
-  const [productos, setProductos] = useState<ProductoAdmin[]>([]);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editando, setEditando] = useState<ProductoAdmin | null>(null);
-  const [creando, setCreando] = useState(false);
-  const [variantesDe, setVariantesDe] = useState<ProductoAdmin | null>(null);
-  const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
-  const [cambiandoDestacado, setCambiandoDestacado] = useState<number | null>(
-    null
-  );
+                    <button
+                      type="button"
+                      onClick={() => quitarImagen(indice)}
+                      className="text-xs text-red-400"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
 
-  async function cargar() {
-    if (!token) return;
-    try {
-      const [datosProductos, respCategorias] = await Promise.all([
-        listarProductosAdmin(token),
-        fetch("/api/admin/categorias").then((r) => r.json()),
-      ]);
-      setProductos(datosProductos);
-      setCategorias(respCategorias);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "No pudimos cargar los productos.");
-    } finally {
-      setCargando(false);
-    }
-  }
+            <button
+              type="button"
+              onClick={agregarImagen}
+              className="text-xs text-purple-400 underline"
+            >
+              + Agregar otra imagen
+            </button>
 
-  useEffect(() => {
-    cargar();
-  }, [token]);
+            <p className="mt-3 text-xs text-purple-500">
+              Podés subir un archivo desde tu computadora con Explorar, o
+              escribir la ruta de una imagen que ya esté en el proyecto.
+              Máximo 5 MB.
+            </p>
+          </div>
 
-  async function guardar(payload: ProductoPayload) {
-    if (!token) return;
-
-    if (editando) {
-      await editarProductoAdmin(token, editando.id, payload);
-    } else {
-      await crearProductoAdmin(token, payload);
-    }
-
-    setEditando(null);
-    setCreando(false);
-    await cargar();
-  }
-
-  async function eliminar(producto: ProductoAdmin) {
-    if (!token) return;
-    const ok = confirm(`¿Seguro que querés eliminar "${producto.nombre}"?`);
-    if (!ok) return;
-
-    try {
-      await eliminarProductoAdmin(token, producto.id);
-      await cargar();
-    } catch (err: any) {
-      alert(err.message || "No se pudo eliminar.");
-    }
-  }
-
-  function alternarSeleccion(id: number) {
-    const copia = new Set(seleccionados);
-    if (copia.has(id)) {
-      copia.delete(id);
-    } else {
-      copia.add(id);
-    }
-    setSeleccionados(copia);
-  }
-
-  const todosSeleccionados =
-    productos.length > 0 && seleccionados.size === productos.length;
-
-  function alternarTodos() {
-    if (todosSeleccionados) {
-      setSeleccionados(new Set());
-    } else {
-      setSeleccionados(new Set(productos.map((p) => p.id)));
-    }
-  }
-
-  async function aplicarMasivo(payload: {
-    precio: number | null;
-    aplicarOferta: boolean;
-    precioOferta: number | null;
-  }) {
-    if (!token) return;
-
-    await editarProductosMasivo(token, {
-      ids: Array.from(seleccionados),
-      ...payload,
-    });
-
-    setSeleccionados(new Set());
-    await cargar();
-  }
-
-  const cantidadDestacados = productos.filter(
-    (p: any) => p.destacado === 1
-  ).length;
-
-  async function toggleDestacado(producto: any) {
-    if (!token) return;
-    const nuevoValor = producto.destacado !== 1;
-
-    setCambiandoDestacado(producto.id);
-    try {
-      await alternarDestacado(token, producto.id, nuevoValor);
-      await cargar();
-    } catch (err: any) {
-      alert(err.message || "No se pudo cambiar el destacado.");
-    } finally {
-      setCambiandoDestacado(null);
-    }
-  }
-
-  return (
-    <section className="max-w-6xl mx-auto">
-      <Link href="/admin" className="text-purple-400 text-sm">
-        ← Volver al panel
-      </Link>
-
-      <div className="mt-4 flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-bold text-purple-100">Productos</h1>
-
-        <button
-          onClick={() => setCreando(true)}
-          className="border border-purple-400 px-4 py-2 rounded-lg text-purple-200"
-        >
-          + Nuevo producto
-        </button>
-      </div>
-
-      <p className="text-sm text-purple-400 mb-4">
-        Destacados en la home: {cantidadDestacados}/{LIMITE_DESTACADOS}
-      </p>
-
-      {productos.length > 0 && (
-        <label className="flex items-center gap-2 cursor-pointer mb-6 w-fit">
-          <input
-            type="checkbox"
-            checked={todosSeleccionados}
-            onChange={alternarTodos}
-            className="w-5 h-5"
-          />
-          <span className="text-sm text-purple-300">
-            Seleccionar todos ({productos.length})
-          </span>
-        </label>
-      )}
-
-      {seleccionados.size > 0 && (
-        <BarraMasiva
-          cantidad={seleccionados.size}
-          onLimpiar={() => setSeleccionados(new Set())}
-          onAplicar={aplicarMasivo}
-        />
-      )}
-
-      {cargando && <p className="text-purple-300">Cargando...</p>}
-      {error && <p className="text-red-400">{error}</p>}
-
-      {!cargando && productos.length === 0 && (
-        <p className="text-purple-300">Todavía no hay productos cargados.</p>
-      )}
-
-      <div className="flex flex-col gap-3">
-        {productos.map((producto: any) => (
-          <div
-            key={producto.uuid}
-            className="border border-purple-700 rounded-xl bg-black/40 p-4 flex flex-wrap items-center gap-4"
-          >
+          {/* VIDEO DE YOUTUBE */}
+          <div className="border border-purple-700 rounded-lg p-4">
+            <label className={label}>Video de YouTube (opcional)</label>
             <input
-              type="checkbox"
-              checked={seleccionados.has(producto.id)}
-              onChange={() => alternarSeleccion(producto.id)}
-              className="w-5 h-5 shrink-0"
+              className={input}
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
             />
+            <p className="mt-2 text-xs text-purple-500">
+              Si lo cargás, aparece como el último slide del carrusel de
+              este producto, después de todas las fotos.
+            </p>
+          </div>
 
-            {/* MINIATURA */}
-            <div className="w-20 h-20 shrink-0 bg-black border border-purple-700 rounded-lg overflow-hidden flex items-center justify-center">
-              {producto.imagenes?.[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={producto.imagenes[0]}
-                  alt={producto.nombre}
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <span className="text-[10px] text-purple-600 text-center px-1">
-                  Sin imagen
-                </span>
-              )}
-            </div>
+          <div>
+            <label className={label}>Nombre</label>
+            <input
+              className={input}
+              value={nombre}
+              onChange={(e) => {
+                setNombre(e.target.value);
+                if (!producto) setSlug(generarSlug(e.target.value));
+              }}
+            />
+          </div>
 
-            <div className="flex-1 min-w-[200px]">
-              <p className="text-purple-100 font-bold">
-                {producto.nombre}
-                {producto.activo === 0 && (
-                  <span className="ml-2 text-xs text-red-400">(inactivo)</span>
-                )}
-              </p>
-              <p className="text-xs text-purple-500">/{producto.slug}</p>
-              <p className="text-xs text-purple-400 mt-1">
-                {producto.categoriaNombre} · nivel{" "}
-                {producto.nivelRequerido ?? 1} · stock{" "}
-                {producto.stockVariantes ?? 0}
-              </p>
-
-              {producto.cantidadVariantes === 0 ? (
-                <p className="text-xs text-amber-400 mt-1">
-                  ⚠ Sin variantes: no se puede comprar
-                </p>
-              ) : (
-                <p className="text-xs text-purple-500 mt-1">
-                  {producto.cantidadVariantes} variante(s)
-                </p>
-              )}
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={producto.destacado === 1}
-                disabled={
-                  cambiandoDestacado === producto.id ||
-                  (producto.destacado !== 1 &&
-                    cantidadDestacados >= LIMITE_DESTACADOS)
-                }
-                onChange={() => toggleDestacado(producto)}
-                className="w-4 h-4"
-              />
-              <span className="text-xs text-purple-300">Destacado</span>
+          <div>
+            <label className={label}>
+              Slug (aparece en la URL del producto)
             </label>
+            <input
+              className={input}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+            />
+            {producto && (
+              <p className="mt-1 text-xs text-amber-400">
+                Si lo cambiás, la URL vieja del producto deja de funcionar.
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() => setSlug(generarSlug(nombre))}
+              className="mt-2 text-xs text-purple-400 underline"
+            >
+              Generar desde el nombre
+            </button>
+          </div>
 
-            <div className="text-right">
-              {producto.precioOferta &&
-              Number(producto.precioOferta) > 0 &&
-              Number(producto.precioOferta) < Number(producto.precio) ? (
-                <>
-                  <p className="text-purple-300 font-bold">
-                    ${Number(producto.precioOferta).toLocaleString("es-AR")}
-                  </p>
-                  <p className="text-xs text-purple-600 line-through">
-                    ${Number(producto.precio).toLocaleString("es-AR")}
-                  </p>
-                </>
-              ) : (
-                <p className="text-purple-300 font-bold">
-                  ${Number(producto.precio).toLocaleString("es-AR")}
-                </p>
-              )}
+          <div>
+            <label className={label}>Categoría</label>
+            <select
+              className={input}
+              value={categoriaId}
+              onChange={(e) => setCategoriaId(Number(e.target.value))}
+            >
+              {categorias.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className={label}>Descripción corta</label>
+            <input
+              className={input}
+              value={descripcionCorta}
+              onChange={(e) => setDescripcionCorta(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className={label}>Descripción larga</label>
+            <textarea
+              className={input}
+              rows={3}
+              value={descripcionLarga}
+              onChange={(e) => setDescripcionLarga(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className={label}>Lore</label>
+            <textarea
+              className={input}
+              rows={2}
+              value={lore}
+              onChange={(e) => setLore(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Precio</label>
+              <input
+                type="number"
+                className={input}
+                value={precio}
+                onChange={(e) => setPrecio(e.target.value)}
+              />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setVariantesDe(producto)}
-                className="border border-purple-500 px-3 py-1 rounded-lg text-sm text-purple-200"
-              >
-                Variantes
-              </button>
-              <button
-                onClick={() => setEditando(producto)}
-                className="border border-purple-500 px-3 py-1 rounded-lg text-sm text-purple-200"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => eliminar(producto)}
-                className="border border-red-500 px-3 py-1 rounded-lg text-sm text-red-300"
-              >
-                Eliminar
-              </button>
+            <div>
+              <label className={label}>
+                Precio de oferta (vacío = sin oferta)
+              </label>
+              <input
+                type="number"
+                className={input}
+                value={precioOferta ?? ""}
+                onChange={(e) => setPrecioOferta(e.target.value)}
+              />
             </div>
           </div>
-        ))}
+
+          {/* PRODUCTO GENERAL */}
+          <div className="border border-purple-700 rounded-lg p-4">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={esGeneral}
+                onChange={(e) => setEsGeneral(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span className="text-purple-100 font-bold">
+                ¿Es un producto general?
+              </span>
+            </label>
+
+            <p className="mt-2 text-xs text-purple-400">
+              Si está marcado, lo puede ver y comprar cualquiera (nivel 1).
+              Si lo desmarcás, se bloquea hasta que el usuario alcance el
+              nivel que elijas.
+            </p>
+
+            {!esGeneral && (
+              <div className="mt-3">
+                <label className={label}>Nivel requerido</label>
+                <input
+                  type="number"
+                  min={1}
+                  className={input}
+                  value={nivelRequerido}
+                  onChange={(e) => setNivelRequerido(Number(e.target.value))}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Rareza</label>
+              <select
+                className={input}
+                value={rareza}
+                onChange={(e) => setRareza(e.target.value)}
+              >
+                {RAREZAS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className={label}>Peso (kg)</label>
+              <input
+                type="number"
+                className={input}
+                value={peso ?? ""}
+                onChange={(e) => setPeso(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <p className="text-xs text-purple-500 -mt-2">
+            El stock se maneja desde "Variantes", después de guardar este
+            producto.
+          </p>
+
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={activo}
+              onChange={(e) => setActivo(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span className="text-purple-200">
+              Activo (visible en la tienda)
+            </span>
+          </label>
+
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+
+          <div className="flex gap-3 mt-2">
+            <button
+              onClick={guardar}
+              disabled={guardando}
+              className="flex-1 border border-purple-400 px-6 py-3 rounded-lg text-purple-200 disabled:opacity-40"
+            >
+              {guardando ? "Guardando..." : "Guardar"}
+            </button>
+
+            <button
+              onClick={onCancelar}
+              className="px-6 py-3 rounded-lg text-purple-400"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
       </div>
-
-      {(creando || editando) && (
-        <FormularioProducto
-          producto={editando}
-          categorias={categorias}
-          onGuardar={guardar}
-          onCancelar={() => {
-            setCreando(false);
-            setEditando(null);
-          }}
-        />
-      )}
-
-      {variantesDe && (
-        <PanelVariantes
-          productoId={variantesDe.id}
-          productoNombre={variantesDe.nombre}
-          onCerrar={() => {
-            setVariantesDe(null);
-            cargar();
-          }}
-        />
-      )}
-    </section>
+    </div>
   );
 }

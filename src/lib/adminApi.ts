@@ -16,6 +16,7 @@ export interface ProductoAdmin {
   activo: number;
   destacado: number;
   imagenes: string[];
+  videoUrl?: string | null;
   cantidadVariantes?: number;
   stockVariantes?: number;
 }
@@ -34,6 +35,7 @@ export interface ProductoPayload {
   peso: number | null;
   activo: boolean;
   imagenes: string[];
+  videoUrl: string | null;
 }
 
 export interface CategoriaAdmin {

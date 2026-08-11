@@ -5,26 +5,55 @@ import { useState } from "react";
 
 interface CarruselProductoProps {
   imagenes: string[];
+  videoUrl?: string | null;
+}
+
+// Extrae el ID de video de distintos formatos de link de YouTube
+function obtenerIdYoutube(url: string): string | null {
+  const patrones = [
+    /(?:youtube\.com\/watch\?v=)([^&]+)/,
+    /(?:youtu\.be\/)([^?]+)/,
+    /(?:youtube\.com\/embed\/)([^?]+)/,
+    /(?:youtube\.com\/shorts\/)([^?]+)/,
+  ];
+
+  for (const patron of patrones) {
+    const match = url.match(patron);
+    if (match) return match[1];
+  }
+
+  return null;
 }
 
 export default function CarruselProducto({
   imagenes,
+  videoUrl,
 }: CarruselProductoProps) {
   const [indice, setIndice] = useState(0);
 
-  const hayImagenes = imagenes && imagenes.length > 0;
+  const idVideo = videoUrl ? obtenerIdYoutube(videoUrl) : null;
 
-  // Frenamos el click para que no dispare el link que envuelve al carrusel
+  // Armamos la lista de slides: fotos primero, video al final si existe
+  type Slide = { tipo: "foto"; url: string } | { tipo: "video"; idVideo: string };
+
+  const slides: Slide[] = [
+    ...imagenes.map((url): Slide => ({ tipo: "foto", url })),
+    ...(idVideo ? [{ tipo: "video" as const, idVideo }] : []),
+  ];
+
+  const haySlides = slides.length > 0;
+  const slideActual = haySlides ? slides[indice] : null;
+
   function anterior(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    setIndice(indice === 0 ? imagenes.length - 1 : indice - 1);
+    setIndice(indice === 0 ? slides.length - 1 : indice - 1);
   }
 
   function siguiente(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    setIndice(indice === imagenes.length - 1 ? 0 : indice + 1);
+    setIndice(indice === slides.length - 1 ? 0 : indice + 1);
   }
 
   return (
@@ -38,14 +67,26 @@ export default function CarruselProducto({
         bg-black
       "
     >
-      {hayImagenes ? (
+      {slideActual?.tipo === "foto" && (
         <Image
-          src={imagenes[indice]}
+          src={slideActual.url}
           alt="Producto"
           fill
           className="object-contain"
         />
-      ) : (
+      )}
+
+      {slideActual?.tipo === "video" && (
+        <iframe
+          src={`https://www.youtube.com/embed/${slideActual.idVideo}`}
+          title="Video del producto"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      )}
+
+      {!haySlides && (
         <div
           className="
             w-full
@@ -61,12 +102,12 @@ export default function CarruselProducto({
         </div>
       )}
 
-      {hayImagenes && imagenes.length > 1 && (
+      {slides.length > 1 && (
         <>
           <button
             type="button"
             onClick={anterior}
-            aria-label="Imagen anterior"
+            aria-label="Anterior"
             className="
               absolute
               left-3
@@ -92,7 +133,7 @@ export default function CarruselProducto({
           <button
             type="button"
             onClick={siguiente}
-            aria-label="Imagen siguiente"
+            aria-label="Siguiente"
             className="
               absolute
               right-3
@@ -117,12 +158,12 @@ export default function CarruselProducto({
 
           {/* Indicador de posicion */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
-            {imagenes.map((_, i) => (
+            {slides.map((slide, i) => (
               <span
                 key={i}
                 className={`w-1.5 h-1.5 rounded-full ${
                   i === indice ? "bg-purple-300" : "bg-purple-700"
-                }`}
+                } ${slide.tipo === "video" ? "ring-1 ring-red-500" : ""}`}
               />
             ))}
           </div>

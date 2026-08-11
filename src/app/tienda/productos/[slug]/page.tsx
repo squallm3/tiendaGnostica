@@ -24,10 +24,17 @@ export default async function ProductoPage({ params }: Props) {
     notFound();
   }
 
+  // El backend ya devuelve fotos y video mezclados, ordenados con el
+  // video al final. Los separamos: imagenes para el carrusel de fotos,
+  // y el link del video aparte.
   const imagenes = producto.imagenes
+    .filter((img: any) => img.tipo !== "video")
     .slice()
     .sort((a: any, b: any) => a.orden - b.orden)
     .map((imagen: any) => imagen.url);
+
+  const videoItem = producto.imagenes.find((img: any) => img.tipo === "video");
+  const videoUrl = videoItem?.url ?? null;
 
   const hayOferta =
     producto.precioOferta !== null &&
@@ -56,7 +63,7 @@ export default async function ProductoPage({ params }: Props) {
           gap-10
         "
       >
-        <CarruselProducto imagenes={imagenes} />
+        <CarruselProducto imagenes={imagenes} videoUrl={videoUrl} />
 
         <div>
           <h2 className="text-3xl font-bold text-purple-100">
