@@ -11,6 +11,7 @@ import {
   editarProductoAdmin,
   eliminarProductoAdmin,
   editarProductosMasivo,
+  alternarDestacado,
   type ProductoAdmin,
   type ProductoPayload,
 } from "@/lib/adminApi";
@@ -19,6 +20,8 @@ interface Categoria {
   id: number;
   nombre: string;
 }
+
+const LIMITE_DESTACADOS = 9;
 
 function BarraMasiva({
   cantidad,
@@ -152,6 +155,9 @@ export default function AdminProductosPage() {
   const [creando, setCreando] = useState(false);
   const [variantesDe, setVariantesDe] = useState<ProductoAdmin | null>(null);
   const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
+  const [cambiandoDestacado, setCambiandoDestacado] = useState<number | null>(
+    null
+  );
 
   async function cargar() {
     if (!token) return;
@@ -238,13 +244,32 @@ export default function AdminProductosPage() {
     await cargar();
   }
 
+  const cantidadDestacados = productos.filter(
+    (p: any) => p.destacado === 1
+  ).length;
+
+  async function toggleDestacado(producto: any) {
+    if (!token) return;
+    const nuevoValor = producto.destacado !== 1;
+
+    setCambiandoDestacado(producto.id);
+    try {
+      await alternarDestacado(token, producto.id, nuevoValor);
+      await cargar();
+    } catch (err: any) {
+      alert(err.message || "No se pudo cambiar el destacado.");
+    } finally {
+      setCambiandoDestacado(null);
+    }
+  }
+
   return (
     <section className="max-w-6xl mx-auto">
       <Link href="/admin" className="text-purple-400 text-sm">
         ← Volver al panel
       </Link>
 
-      <div className="mt-4 flex items-center justify-between mb-4">
+      <div className="mt-4 flex items-center justify-between mb-2">
         <h1 className="text-3xl font-bold text-purple-100">Productos</h1>
 
         <button
@@ -254,6 +279,10 @@ export default function AdminProductosPage() {
           + Nuevo producto
         </button>
       </div>
+
+      <p className="text-sm text-purple-400 mb-4">
+        Destacados en la home: {cantidadDestacados}/{LIMITE_DESTACADOS}
+      </p>
 
       {productos.length > 0 && (
         <label className="flex items-center gap-2 cursor-pointer mb-6 w-fit">
@@ -337,6 +366,21 @@ export default function AdminProductosPage() {
                 </p>
               )}
             </div>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={producto.destacado === 1}
+                disabled={
+                  cambiandoDestacado === producto.id ||
+                  (producto.destacado !== 1 &&
+                    cantidadDestacados >= LIMITE_DESTACADOS)
+                }
+                onChange={() => toggleDestacado(producto)}
+                className="w-4 h-4"
+              />
+              <span className="text-xs text-purple-300">Destacado</span>
+            </label>
 
             <div className="text-right">
               {producto.precioOferta &&

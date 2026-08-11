@@ -14,6 +14,7 @@ export interface ProductoAdmin {
   rareza: string;
   peso: string | null;
   activo: number;
+  destacado: number;
   imagenes: string[];
   cantidadVariantes?: number;
   stockVariantes?: number;
@@ -131,6 +132,22 @@ export async function editarProductosMasivo(
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
+  });
+  return manejar(respuesta);
+}
+
+export async function alternarDestacado(
+  token: string,
+  id: number,
+  destacado: boolean
+) {
+  const respuesta = await fetch(`/api/admin/productos/${id}/destacado`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ destacado }),
   });
   return manejar(respuesta);
 }
