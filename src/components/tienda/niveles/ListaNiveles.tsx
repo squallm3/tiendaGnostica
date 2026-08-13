@@ -41,10 +41,24 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
     return Math.max(0, xpNecesaria - xpActual);
   }
 
+  // Niveles ya alcanzados, del mas alto al mas bajo
+  const alcanzados = niveles
+    .filter((n) => n.id <= nivelUsuario)
+    .sort((a, b) => b.id - a.id);
+
+  // Solo el proximo nivel bloqueado, como objetivo
+  const proximoBloqueado = niveles
+    .filter((n) => n.id > nivelUsuario)
+    .sort((a, b) => a.id - b.id)[0];
+
+  const nivelesAMostrar = proximoBloqueado
+    ? [proximoBloqueado, ...alcanzados]
+    : alcanzados;
+
   return (
     <>
       <div className="flex flex-col gap-8">
-        {niveles.map((nivel) => {
+        {nivelesAMostrar.map((nivel) => {
           const bloqueado = nivel.id > nivelUsuario;
 
           return (
@@ -89,7 +103,14 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
                   {nivel.titulo ?? "Sin título"}
                 </p>
 
-                {bloqueado && <span className="text-2xl">🔒</span>}
+                {bloqueado && (
+                  <>
+                    <span className="text-2xl">🔒</span>
+                    <p className="text-xs text-purple-500 uppercase tracking-wide">
+                      Próximo objetivo
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* PRODUCTOS */}
