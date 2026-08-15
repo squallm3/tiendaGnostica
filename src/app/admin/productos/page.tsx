@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/tienda/AuthContext";
 import FormularioProducto from "@/components/admin/FormularioProducto";
@@ -158,6 +158,7 @@ export default function AdminProductosPage() {
   const [cambiandoDestacado, setCambiandoDestacado] = useState<number | null>(
     null
   );
+  const [filtroCategoria, setFiltroCategoria] = useState<string>("todas");
 
   async function cargar() {
     if (!token) return;
@@ -179,6 +180,13 @@ export default function AdminProductosPage() {
   useEffect(() => {
     cargar();
   }, [token]);
+
+  const productosFiltrados = useMemo(() => {
+    if (filtroCategoria === "todas") return productos;
+    return productos.filter(
+      (p: any) => String(p.categoriaId) === filtroCategoria
+    );
+  }, [productos, filtroCategoria]);
 
   async function guardar(payload: ProductoPayload) {
     if (!token) return;
@@ -218,13 +226,14 @@ export default function AdminProductosPage() {
   }
 
   const todosSeleccionados =
-    productos.length > 0 && seleccionados.size === productos.length;
+    productosFiltrados.length > 0 &&
+    productosFiltrados.every((p) => seleccionados.has(p.id));
 
   function alternarTodos() {
     if (todosSeleccionados) {
       setSeleccionados(new Set());
     } else {
-      setSeleccionados(new Set(productos.map((p) => p.id)));
+      setSeleccionados(new Set(productosFiltrados.map((p) => p.id)));
     }
   }
 
@@ -269,7 +278,7 @@ export default function AdminProductosPage() {
         ← Volver al panel
       </Link>
 
-      <div className="mt-4 flex items-center justify-between mb-2">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 mb-2">
         <h1 className="text-3xl font-bold text-purple-100">Productos</h1>
 
         <button
@@ -284,7 +293,34 @@ export default function AdminProductosPage() {
         Destacados en la home: {cantidadDestacados}/{LIMITE_DESTACADOS}
       </p>
 
-      {productos.length > 0 && (
+      {/* FILTRO POR CATEGORIA */}
+      <div className="mb-6">
+        <label className="text-xs text-purple-400 block mb-1">
+          Filtrar por categoría
+        </label>
+        <select
+          value={filtroCategoria}
+          onChange={(e) => {
+            setFiltroCategoria(e.target.value);
+            setSeleccionados(new Set());
+          }}
+          className="bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 outline-none text-sm"
+        >
+          <option value="todas">Todas las categorías ({productos.length})</option>
+          {categorias.map((c) => {
+            const cantidad = productos.filter(
+              (p: any) => p.categoriaId === c.id
+            ).length;
+            return (
+              <option key={c.id} value={c.id}>
+                {c.nombre} ({cantidad})
+              </option>
+            );
+          })}
+        </select>
+      </div>
+
+      {productosFiltrados.length > 0 && (
         <label className="flex items-center gap-2 cursor-pointer mb-6 w-fit">
           <input
             type="checkbox"
@@ -293,7 +329,7 @@ export default function AdminProductosPage() {
             className="w-5 h-5"
           />
           <span className="text-sm text-purple-300">
-            Seleccionar todos ({productos.length})
+            Seleccionar todos ({productosFiltrados.length})
           </span>
         </label>
       )}
@@ -309,12 +345,14 @@ export default function AdminProductosPage() {
       {cargando && <p className="text-purple-300">Cargando...</p>}
       {error && <p className="text-red-400">{error}</p>}
 
-      {!cargando && productos.length === 0 && (
-        <p className="text-purple-300">Todavía no hay productos cargados.</p>
+      {!cargando && productosFiltrados.length === 0 && (
+        <p className="text-purple-300">
+          No hay productos {filtroCategoria !== "todas" ? "en esta categoría" : "cargados"}.
+        </p>
       )}
 
       <div className="flex flex-col gap-3">
-        {productos.map((producto: any) => (
+        {productosFiltrados.map((producto: any) => (
           <div
             key={producto.uuid}
             className="border border-purple-700 rounded-xl bg-black/40 p-4 flex flex-wrap items-center gap-4"
