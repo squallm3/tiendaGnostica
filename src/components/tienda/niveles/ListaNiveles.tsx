@@ -1,19 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/lib/tienda/AuthContext";
-
-interface ProductoNivel {
-  uuid: string;
-  nombre: string;
-  slug: string;
-  precio: string;
-  precioOferta: string | null;
-  imagenes: string[];
-  categoriaNombre: string | null;
-}
 
 interface Nivel {
   id: number;
@@ -21,13 +10,148 @@ interface Nivel {
   titulo: string | null;
   artefacto: string | null;
   imagenA: string | null;
+  imagenB: string | null;
+  imagenA3d: string | null;
   xpAcumulada: number | null;
-  productos: ProductoNivel[];
 }
 
-function formatear(valor: number | string) {
-  const numero = Number(valor);
-  return Number.isFinite(numero) ? numero.toLocaleString("es-AR") : valor;
+const OPCIONES_PRENDA = [
+  "Remera",
+  "Gorra",
+  "Hoodie",
+  "Jogging",
+  "Taza",
+  "Sticker",
+  "Otro",
+];
+
+function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
+  const [seleccion, setSeleccion] = useState<"a" | "b" | null>(null);
+  const [prenda, setPrenda] = useState("");
+
+  const puedeContinuar = seleccion !== null && prenda !== "";
+
+  function continuar() {
+    // La segunda pantalla del flujo se define mas adelante.
+    console.log("Continuar con:", {
+      nivelId: nivel.id,
+      diseno: seleccion,
+      prenda,
+    });
+  }
+
+  return (
+    <div className="border border-purple-700 rounded-xl bg-black/40 p-5">
+      <div className="text-center mb-5">
+        <p className="text-purple-400 text-sm uppercase tracking-wide">
+          Nivel {nivel.id}
+        </p>
+        <p className="text-purple-100 font-bold text-lg">
+          {nivel.titulo ?? "Sin título"}
+        </p>
+        {nivel.artefacto && (
+          <p className="text-purple-300 text-sm mt-1">{nivel.artefacto}</p>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* IMAGEN A */}
+        {nivel.imagenA && (
+          <button
+            type="button"
+            onClick={() => setSeleccion("a")}
+            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+              seleccion === "a" ? "border-purple-300" : "border-purple-700"
+            }`}
+          >
+            <Image
+              src={`/tienda/niveles/${nivel.imagenA}`}
+              alt={`${nivel.titulo ?? "Nivel"} - diseño A`}
+              fill
+              className="object-cover"
+            />
+            {seleccion === "a" && (
+              <span className="absolute top-2 right-2 bg-purple-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                ✓
+              </span>
+            )}
+          </button>
+        )}
+
+        {/* IMAGEN B */}
+        {nivel.imagenB && (
+          <button
+            type="button"
+            onClick={() => setSeleccion("b")}
+            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+              seleccion === "b" ? "border-purple-300" : "border-purple-700"
+            }`}
+          >
+            <Image
+              src={`/tienda/niveles/${nivel.imagenB}`}
+              alt={`${nivel.titulo ?? "Nivel"} - diseño B`}
+              fill
+              className="object-cover"
+            />
+            {seleccion === "b" && (
+              <span className="absolute top-2 right-2 bg-purple-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                ✓
+              </span>
+            )}
+          </button>
+        )}
+
+        {/* IMAGEN 3D (solo vista, no seleccionable) */}
+        {nivel.imagenA3d && (
+          <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-purple-800">
+            <Image
+              src={`/tienda/niveles/${nivel.imagenA3d}`}
+              alt={`${nivel.titulo ?? "Nivel"} - vista 3D`}
+              fill
+              className="object-cover"
+            />
+            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] bg-black/70 text-purple-300 px-2 py-0.5 rounded">
+              Vista 3D
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-5">
+        <select
+          value={prenda}
+          onChange={(e) => setPrenda(e.target.value)}
+          className="w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 outline-none"
+        >
+          <option value="">Seleccioná uno</option>
+          {OPCIONES_PRENDA.map((op) => (
+            <option key={op} value={op}>
+              {op}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <button
+        onClick={continuar}
+        disabled={!puedeContinuar}
+        className="
+          mt-4
+          w-full
+          border
+          border-purple-400
+          px-6
+          py-3
+          rounded-lg
+          text-purple-200
+          disabled:opacity-30
+          disabled:cursor-not-allowed
+        "
+      >
+        Continuar
+      </button>
+    </div>
+  );
 }
 
 export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
@@ -51,142 +175,62 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
     .filter((n) => n.id > nivelUsuario)
     .sort((a, b) => a.id - b.id)[0];
 
-  const nivelesAMostrar = proximoBloqueado
-    ? [proximoBloqueado, ...alcanzados]
-    : alcanzados;
-
   return (
     <>
       <div className="flex flex-col gap-8">
-        {nivelesAMostrar.map((nivel) => {
-          const bloqueado = nivel.id > nivelUsuario;
+        {proximoBloqueado && (
+          <div
+            onClick={() => setPopup(proximoBloqueado)}
+            className="
+              grid
+              grid-cols-1
+              md:grid-cols-[220px_1fr]
+              gap-6
+              border
+              border-purple-700
+              rounded-xl
+              bg-black/40
+              p-5
+              cursor-pointer
+            "
+          >
+            <div className="flex flex-col items-center text-center gap-2">
+              {proximoBloqueado.imagenA && (
+                <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-purple-400 opacity-30">
+                  <Image
+                    src={`/tienda/niveles/${proximoBloqueado.imagenA}`}
+                    alt={proximoBloqueado.titulo ?? `Nivel ${proximoBloqueado.id}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
 
-          return (
-            <div
-              key={nivel.uuid}
-              onClick={() => bloqueado && setPopup(nivel)}
-              className={`
-                grid
-                grid-cols-1
-                md:grid-cols-[220px_1fr]
-                gap-6
-                border
-                border-purple-700
-                rounded-xl
-                bg-black/40
-                p-5
-                ${bloqueado ? "cursor-pointer" : ""}
-              `}
-            >
-              {/* NIVEL */}
-              <div className="flex flex-col items-center text-center gap-2">
-                {nivel.imagenA && (
-                  <div
-                    className={`relative w-24 h-24 rounded-full overflow-hidden border-2 border-purple-400 ${
-                      bloqueado ? "opacity-30" : ""
-                    }`}
-                  >
-                    <Image
-                      src={`/tienda/niveles/${nivel.imagenA}`}
-                      alt={nivel.titulo ?? `Nivel ${nivel.id}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
+              <p className="text-purple-400 text-sm uppercase tracking-wide">
+                Nivel {proximoBloqueado.id}
+              </p>
 
-                <p className="text-purple-400 text-sm uppercase tracking-wide">
-                  Nivel {nivel.id}
-                </p>
+              <p className="text-purple-100 font-bold">
+                {proximoBloqueado.titulo ?? "Sin título"}
+              </p>
 
-                <p className="text-purple-100 font-bold">
-                  {nivel.titulo ?? "Sin título"}
-                </p>
-
-                {bloqueado && (
-                  <>
-                    <span className="text-2xl">🔒</span>
-                    <p className="text-xs text-purple-500 uppercase tracking-wide">
-                      Próximo objetivo
-                    </p>
-                  </>
-                )}
-              </div>
-
-              {/* PRODUCTOS */}
-              <div>
-                {nivel.productos.length === 0 ? (
-                  <p className="text-purple-500 text-sm">
-                    Todavía no hay productos en este nivel.
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {nivel.productos.map((producto) => {
-                      const hayOferta =
-                        producto.precioOferta !== null &&
-                        producto.precioOferta !== undefined &&
-                        Number(producto.precioOferta) > 0 &&
-                        Number(producto.precioOferta) < Number(producto.precio);
-
-                      const contenido = (
-                        <div
-                          className={`border border-purple-600 rounded-lg p-2 ${
-                            bloqueado ? "opacity-30" : ""
-                          }`}
-                        >
-                          <div className="relative w-full aspect-square bg-black rounded overflow-hidden">
-                            {producto.imagenes[0] ? (
-                              <Image
-                                src={producto.imagenes[0]}
-                                alt={producto.nombre}
-                                fill
-                                className="object-contain"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-purple-500 text-xs">
-                                Sin imagen
-                              </div>
-                            )}
-                          </div>
-
-                          <p className="mt-2 text-xs text-purple-200 line-clamp-2">
-                            {producto.nombre}
-                          </p>
-
-                          {hayOferta ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-xs text-purple-400 font-bold">
-                                ${formatear(producto.precioOferta!)}
-                              </span>
-                              <span className="text-[10px] text-purple-600 line-through">
-                                ${formatear(producto.precio)}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-purple-400 font-bold">
-                              ${formatear(producto.precio)}
-                            </span>
-                          )}
-                        </div>
-                      );
-
-                      return bloqueado ? (
-                        <div key={producto.uuid}>{contenido}</div>
-                      ) : (
-                        <Link
-                          key={producto.uuid}
-                          href={`/tienda/productos/${producto.slug}`}
-                        >
-                          {contenido}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <span className="text-2xl">🔒</span>
+              <p className="text-xs text-purple-500 uppercase tracking-wide">
+                Próximo objetivo
+              </p>
             </div>
-          );
-        })}
+
+            <div className="flex items-center justify-center">
+              <p className="text-purple-500 text-sm text-center">
+                Tocá para ver cuánta experiencia te falta.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {alcanzados.map((nivel) => (
+          <TarjetaAlcanzada key={nivel.uuid} nivel={nivel} />
+        ))}
       </div>
 
       {/* POPUP DE NIVEL BLOQUEADO */}
@@ -205,9 +249,7 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
               Nivel {popup.id} bloqueado
             </h3>
 
-            <p className="mt-2 text-purple-300">
-              {popup.titulo ?? ""}
-            </p>
+            <p className="mt-2 text-purple-300">{popup.titulo ?? ""}</p>
 
             <p className="mt-4 text-purple-200">
               Te falta{" "}
