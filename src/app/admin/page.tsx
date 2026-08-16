@@ -17,6 +17,13 @@ const SECCIONES = [
     disponible: true,
   },
   {
+    titulo: "Niveles",
+    descripcion: "Título, artefacto, lore, XP e imágenes de cada nivel.",
+    href: "/admin/niveles",
+    icono: "⭐",
+    disponible: true,
+  },
+  {
     titulo: "Usuarios",
     descripcion: "Gestionar cuentas y permisos de administración.",
     href: "/admin/usuarios",
