@@ -15,39 +15,23 @@ interface Nivel {
   xpAcumulada: number | null;
 }
 
-const OPCIONES_PRENDA = [
-  "Remera",
-  "Gorra",
-  "Hoodie",
-  "Jogging",
-  "Impresión 3D",
-  "Taza",
-  "Sticker",
-  "Otro",
-];
+const OPCIONES_PRENDA = ["Remera", "Hoodie", "Taza", "Sticker"];
 
 const COLORES = ["Negro", "Blanco", "Rojo", "Violeta"];
 const TALLES_REMERA_HOODIE = ["S", "M", "L", "XL", "XXL"];
-const TALLES_JOGGING = ["38", "40", "42", "44", "46"];
 
 // Que campos necesita cada prenda
 function reglasPrenda(prenda: string) {
   if (prenda === "Remera" || prenda === "Hoodie") {
-    return { talles: TALLES_REMERA_HOODIE, color: true, textoLibre: false };
+    return { talles: TALLES_REMERA_HOODIE, color: true };
   }
-  if (prenda === "Jogging") {
-    return { talles: TALLES_JOGGING, color: true, textoLibre: false };
+  if (prenda === "Taza") {
+    return { talles: null, color: true };
   }
-  if (prenda === "Gorra" || prenda === "Taza") {
-    return { talles: null, color: true, textoLibre: false };
+  if (prenda === "Sticker") {
+    return { talles: null, color: false };
   }
-  if (prenda === "Impresión 3D" || prenda === "Sticker") {
-    return { talles: null, color: false, textoLibre: false };
-  }
-  if (prenda === "Otro") {
-    return { talles: null, color: false, textoLibre: true };
-  }
-  return { talles: null, color: false, textoLibre: false };
+  return { talles: null, color: false };
 }
 
 function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
@@ -55,7 +39,6 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
   const [prenda, setPrenda] = useState("");
   const [talle, setTalle] = useState("");
   const [color, setColor] = useState("");
-  const [textoLibre, setTextoLibre] = useState("");
 
   const reglas = prenda ? reglasPrenda(prenda) : null;
 
@@ -64,15 +47,13 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
     // Al cambiar de prenda, se resetean las opciones anteriores
     setTalle("");
     setColor("");
-    setTextoLibre("");
   }
 
   const puedeContinuar =
     seleccion !== null &&
     prenda !== "" &&
     (!reglas?.talles || talle !== "") &&
-    (!reglas?.color || color !== "") &&
-    (!reglas?.textoLibre || textoLibre.trim() !== "");
+    (!reglas?.color || color !== "");
 
   function continuar() {
     // Mas adelante esto avanza al checkout real (se agrega como
@@ -83,7 +64,6 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
       prenda,
       talle: talle || null,
       color: color || null,
-      textoLibre: textoLibre || null,
     });
   }
 
@@ -184,7 +164,7 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
       </div>
 
       {/* OPCIONES DINAMICAS SEGUN LA PRENDA */}
-      {reglas && (reglas.talles || reglas.color || reglas.textoLibre) && (
+      {reglas && (reglas.talles || reglas.color) && (
         <div className="mt-4 flex flex-wrap gap-4">
           {reglas.talles && (
             <div className="flex-1 min-w-[140px]">
@@ -225,21 +205,6 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
               </select>
             </div>
           )}
-
-          {reglas.textoLibre && (
-            <div className="flex-1 min-w-[200px]">
-              <label className="text-xs text-purple-400 block mb-1">
-                Contanos qué querés
-              </label>
-              <textarea
-                value={textoLibre}
-                onChange={(e) => setTextoLibre(e.target.value)}
-                rows={2}
-                className={inputClase}
-                placeholder="Describí el objeto que te gustaría..."
-              />
-            </div>
-          )}
         </div>
       )}
 
@@ -276,12 +241,10 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
     return Math.max(0, xpNecesaria - xpActual);
   }
 
-  // Niveles ya alcanzados, del mas alto al mas bajo
   const alcanzados = niveles
     .filter((n) => n.id <= nivelUsuario)
     .sort((a, b) => b.id - a.id);
 
-  // Solo el proximo nivel bloqueado, como objetivo
   const proximoBloqueado = niveles
     .filter((n) => n.id > nivelUsuario)
     .sort((a, b) => a.id - b.id)[0];
