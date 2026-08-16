@@ -54,13 +54,13 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="flex flex-wrap items-start justify-center gap-4">
         {/* IMAGEN A */}
         {nivel.imagenA && (
           <button
             type="button"
             onClick={() => setSeleccion("a")}
-            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+            className={`relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 transition ${
               seleccion === "a" ? "border-purple-300" : "border-purple-700"
             }`}
           >
@@ -71,7 +71,7 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
               className="object-cover"
             />
             {seleccion === "a" && (
-              <span className="absolute top-2 right-2 bg-purple-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+              <span className="absolute top-1 right-1 bg-purple-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 ✓
               </span>
             )}
@@ -83,7 +83,7 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
           <button
             type="button"
             onClick={() => setSeleccion("b")}
-            className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
+            className={`relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 transition ${
               seleccion === "b" ? "border-purple-300" : "border-purple-700"
             }`}
           >
@@ -94,7 +94,7 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
               className="object-cover"
             />
             {seleccion === "b" && (
-              <span className="absolute top-2 right-2 bg-purple-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+              <span className="absolute top-1 right-1 bg-purple-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 ✓
               </span>
             )}
@@ -103,33 +103,34 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
 
         {/* IMAGEN 3D (solo vista, no seleccionable) */}
         {nivel.imagenA3d && (
-          <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-purple-800">
+          <div className="relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 border-purple-800">
             <Image
               src={`/tienda/niveles/${nivel.imagenA3d}`}
               alt={`${nivel.titulo ?? "Nivel"} - vista 3D`}
               fill
               className="object-cover"
             />
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] bg-black/70 text-purple-300 px-2 py-0.5 rounded">
-              Vista 3D
+            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] bg-black/70 text-purple-300 px-1.5 py-0.5 rounded">
+              3D
             </span>
           </div>
         )}
-      </div>
 
-      <div className="mt-5">
-        <select
-          value={prenda}
-          onChange={(e) => setPrenda(e.target.value)}
-          className="w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 outline-none"
-        >
-          <option value="">Seleccioná uno</option>
-          {OPCIONES_PRENDA.map((op) => (
-            <option key={op} value={op}>
-              {op}
-            </option>
-          ))}
-        </select>
+        {/* DROPDOWN, en la misma fila */}
+        <div className="flex-1 min-w-[160px] self-center">
+          <select
+            value={prenda}
+            onChange={(e) => setPrenda(e.target.value)}
+            className="w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 outline-none"
+          >
+            <option value="">Seleccioná uno</option>
+            {OPCIONES_PRENDA.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <button
