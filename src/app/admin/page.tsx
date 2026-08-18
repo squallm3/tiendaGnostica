@@ -24,6 +24,13 @@ const SECCIONES = [
     disponible: true,
   },
   {
+    titulo: "Tipos de artículo",
+    descripcion: "Remera, Hoodie, Taza, Sticker y sus reglas de talle/color.",
+    href: "/admin/tipos-articulo-nivel",
+    icono: "👕",
+    disponible: true,
+  },
+  {
     titulo: "Usuarios",
     descripcion: "Gestionar cuentas y permisos de administración.",
     href: "/admin/usuarios",
