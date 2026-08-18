@@ -29,6 +29,7 @@ function FormularioTipo({ tipo, onGuardar, onCancelar }: FormularioProps) {
   const [requiereColor, setRequiereColor] = useState(
     tipo ? tipo.requiereColor === 1 : false
   );
+  const [precio, setPrecio] = useState(tipo?.precio ?? "0");
   const [activo, setActivo] = useState(tipo ? tipo.activo === 1 : true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +56,7 @@ function FormularioTipo({ tipo, onGuardar, onCancelar }: FormularioProps) {
           ? tallesTexto.split(",").map((t) => t.trim()).filter(Boolean)
           : [],
         requiereColor,
+        precio: Number(precio) || 0,
         activo,
       });
     } catch (err: any) {
@@ -82,6 +84,16 @@ function FormularioTipo({ tipo, onGuardar, onCancelar }: FormularioProps) {
               className={input}
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className={label}>Precio</label>
+            <input
+              type="number"
+              className={input}
+              value={precio}
+              onChange={(e) => setPrecio(e.target.value)}
             />
           </div>
 
@@ -247,6 +259,7 @@ export default function AdminTiposArticuloPage() {
                 )}
               </p>
               <p className="text-xs text-purple-400 mt-1">
+                ${Number(tipo.precio).toLocaleString("es-AR")} ·{" "}
                 {tipo.requiereTalle
                   ? `Talles: ${tipo.tallesDisponibles.join(", ")}`
                   : "Sin talle"}
