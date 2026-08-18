@@ -26,6 +26,13 @@ interface TipoArticulo {
 
 const COLORES = ["Negro", "Blanco", "Rojo", "Violeta"];
 
+// Las imagenes de nivel viejas se guardan solo con el nombre de archivo
+// (van en /tienda/niveles/xxx). Las subidas nuevas con "Explorar" ya
+// vienen con la ruta completa (/uploads/productos/xxx).
+function rutaImagenNivel(valor: string) {
+  return valor.startsWith("/uploads") ? valor : `/tienda/niveles/${valor}`;
+}
+
 function TarjetaAlcanzada({
   nivel,
   tipos,
@@ -94,7 +101,7 @@ function TarjetaAlcanzada({
             }`}
           >
             <Image
-              src={`/tienda/niveles/${nivel.imagenA}`}
+              src={rutaImagenNivel(nivel.imagenA)}
               alt={`${nivel.titulo ?? "Nivel"} - diseño A`}
               fill
               className="object-cover"
@@ -117,7 +124,7 @@ function TarjetaAlcanzada({
             }`}
           >
             <Image
-              src={`/tienda/niveles/${nivel.imagenB}`}
+              src={rutaImagenNivel(nivel.imagenB)}
               alt={`${nivel.titulo ?? "Nivel"} - diseño B`}
               fill
               className="object-cover"
@@ -134,7 +141,7 @@ function TarjetaAlcanzada({
         {nivel.imagenA3d && (
           <div className="relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 border-purple-800">
             <Image
-              src={`/tienda/niveles/${nivel.imagenA3d}`}
+              src={rutaImagenNivel(nivel.imagenA3d)}
               alt={`${nivel.titulo ?? "Nivel"} - vista 3D`}
               fill
               className="object-cover"
@@ -281,7 +288,7 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
               {proximoBloqueado.imagenA && (
                 <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-purple-400 opacity-30">
                   <Image
-                    src={`/tienda/niveles/${proximoBloqueado.imagenA}`}
+                    src={rutaImagenNivel(proximoBloqueado.imagenA)}
                     alt={proximoBloqueado.titulo ?? `Nivel ${proximoBloqueado.id}`}
                     fill
                     className="object-cover"
