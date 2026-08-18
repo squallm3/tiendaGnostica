@@ -10,10 +10,91 @@ import {
   type NivelAdmin,
   type NivelPayload,
 } from "@/lib/adminNiveles";
+import {
+  listarTiposArticuloAdmin,
+  actualizarPreciosTipoArticulo,
+  type TipoArticuloAdmin,
+} from "@/lib/adminTiposArticulo";
+
+function PanelPrecios({
+  tipos,
+  onGuardado,
+}: {
+  tipos: TipoArticuloAdmin[];
+  onGuardado: (tipos: TipoArticuloAdmin[]) => void;
+}) {
+  const { token } = useAuth();
+  const [valores, setValores] = useState<Record<number, string>>(() =>
+    Object.fromEntries(tipos.map((t) => [t.id, t.precio]))
+  );
+  const [guardando, setGuardando] = useState(false);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+
+  async function guardar() {
+    if (!token) return;
+    setGuardando(true);
+    setMensaje(null);
+
+    try {
+      const precios = tipos.map((t) => ({
+        id: t.id,
+        precio: Number(valores[t.id]) || 0,
+      }));
+      const actualizados = await actualizarPreciosTipoArticulo(token, precios);
+      onGuardado(actualizados);
+      setMensaje("Precios actualizados.");
+    } catch (err: any) {
+      setMensaje(err.message || "No se pudo guardar.");
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  return (
+    <div className="border border-purple-500 rounded-xl bg-black/40 p-5 mb-8">
+      <p className="text-purple-100 font-bold mb-1">
+        Precios de artículos personalizados
+      </p>
+      <p className="text-xs text-purple-400 mb-4">
+        Precio único por tipo de artículo, sin importar el nivel o el diseño
+        elegido.
+      </p>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {tipos.map((t) => (
+          <div key={t.id}>
+            <label className="text-xs text-purple-400 block mb-1">
+              {t.nombre}
+            </label>
+            <input
+              type="number"
+              value={valores[t.id] ?? ""}
+              onChange={(e) =>
+                setValores({ ...valores, [t.id]: e.target.value })
+              }
+              className="w-full bg-black border border-purple-600 rounded-lg px-3 py-2 text-purple-100 outline-none"
+            />
+          </div>
+        ))}
+      </div>
+
+      {mensaje && <p className="text-xs text-purple-300 mt-3">{mensaje}</p>}
+
+      <button
+        onClick={guardar}
+        disabled={guardando}
+        className="mt-4 border border-purple-400 px-4 py-2 rounded-lg text-sm text-purple-200 disabled:opacity-40"
+      >
+        {guardando ? "Guardando..." : "Guardar precios"}
+      </button>
+    </div>
+  );
+}
 
 export default function AdminNivelesPage() {
   const { token } = useAuth();
   const [niveles, setNiveles] = useState<NivelAdmin[]>([]);
+  const [tipos, setTipos] = useState<TipoArticuloAdmin[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editando, setEditando] = useState<NivelAdmin | null>(null);
@@ -21,8 +102,12 @@ export default function AdminNivelesPage() {
   async function cargar() {
     if (!token) return;
     try {
-      const datos = await listarNivelesAdmin(token);
-      setNiveles(datos);
+      const [datosNiveles, datosTipos] = await Promise.all([
+        listarNivelesAdmin(token),
+        listarTiposArticuloAdmin(token),
+      ]);
+      setNiveles(datosNiveles);
+      setTipos(datosTipos);
     } catch (err: any) {
       setError(err.message || "No pudimos cargar los niveles.");
     } finally {
@@ -47,9 +132,13 @@ export default function AdminNivelesPage() {
         ← Volver al panel
       </Link>
 
-      <h1 className="mt-4 text-3xl font-bold text-purple-100 mb-8">
-        Niveles
+      <h1 className="mt-4 text-3xl font-bold text-purple-100 mb-6">
+        Modificar Artículos de Mi Nivel
       </h1>
+
+      {!cargando && tipos.length > 0 && (
+        <PanelPrecios tipos={tipos} onGuardado={setTipos} />
+      )}
 
       {cargando && <p className="text-purple-300">Cargando...</p>}
       {error && <p className="text-red-400">{error}</p>}

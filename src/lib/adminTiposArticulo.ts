@@ -5,6 +5,7 @@ export interface TipoArticuloAdmin {
   requiereTalle: number;
   tallesDisponibles: string[];
   requiereColor: number;
+  precio: string;
   orden: number;
   activo: number;
 }
@@ -14,6 +15,7 @@ export interface TipoArticuloPayload {
   requiereTalle: boolean;
   tallesDisponibles: string[];
   requiereColor: boolean;
+  precio: number;
   activo: boolean;
 }
 
@@ -69,6 +71,21 @@ export async function eliminarTipoArticuloAdmin(token: string, id: number) {
   const respuesta = await fetch(`/api/admin/tipos-articulo-nivel/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
+  });
+  return manejar(respuesta);
+}
+
+export async function actualizarPreciosTipoArticulo(
+  token: string,
+  precios: { id: number; precio: number }[]
+): Promise<TipoArticuloAdmin[]> {
+  const respuesta = await fetch("/api/admin/tipos-articulo-nivel/precios", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ precios }),
   });
   return manejar(respuesta);
 }
