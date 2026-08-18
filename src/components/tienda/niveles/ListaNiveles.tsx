@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/tienda/AuthContext";
 
 interface Nivel {
@@ -15,35 +15,33 @@ interface Nivel {
   xpAcumulada: number | null;
 }
 
-const OPCIONES_PRENDA = ["Remera", "Hoodie", "Taza", "Sticker"];
-
-const COLORES = ["Negro", "Blanco", "Rojo", "Violeta"];
-const TALLES_REMERA_HOODIE = ["S", "M", "L", "XL", "XXL"];
-
-// Que campos necesita cada prenda
-function reglasPrenda(prenda: string) {
-  if (prenda === "Remera" || prenda === "Hoodie") {
-    return { talles: TALLES_REMERA_HOODIE, color: true };
-  }
-  if (prenda === "Taza") {
-    return { talles: null, color: true };
-  }
-  if (prenda === "Sticker") {
-    return { talles: null, color: false };
-  }
-  return { talles: null, color: false };
+interface TipoArticulo {
+  id: number;
+  uuid: string;
+  nombre: string;
+  requiereTalle: number;
+  tallesDisponibles: string[];
+  requiereColor: number;
 }
 
-function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
+const COLORES = ["Negro", "Blanco", "Rojo", "Violeta"];
+
+function TarjetaAlcanzada({
+  nivel,
+  tipos,
+}: {
+  nivel: Nivel;
+  tipos: TipoArticulo[];
+}) {
   const [seleccion, setSeleccion] = useState<"a" | "b" | null>(null);
-  const [prenda, setPrenda] = useState("");
+  const [tipoId, setTipoId] = useState("");
   const [talle, setTalle] = useState("");
   const [color, setColor] = useState("");
 
-  const reglas = prenda ? reglasPrenda(prenda) : null;
+  const tipoElegido = tipos.find((t) => String(t.id) === tipoId) ?? null;
 
-  function cambiarPrenda(valor: string) {
-    setPrenda(valor);
+  function cambiarTipo(valor: string) {
+    setTipoId(valor);
     // Al cambiar de prenda, se resetean las opciones anteriores
     setTalle("");
     setColor("");
@@ -51,9 +49,9 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
 
   const puedeContinuar =
     seleccion !== null &&
-    prenda !== "" &&
-    (!reglas?.talles || talle !== "") &&
-    (!reglas?.color || color !== "");
+    tipoElegido !== null &&
+    (!tipoElegido.requiereTalle || talle !== "") &&
+    (!tipoElegido.requiereColor || color !== "");
 
   function continuar() {
     // Mas adelante esto avanza al checkout real (se agrega como
@@ -61,7 +59,8 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
     console.log("Continuar con:", {
       nivelId: nivel.id,
       diseno: seleccion,
-      prenda,
+      tipoArticuloId: tipoElegido?.id,
+      tipoArticuloNombre: tipoElegido?.nombre,
       talle: talle || null,
       color: color || null,
     });
@@ -149,14 +148,14 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
         {/* DROPDOWN DE PRENDA, en la misma fila */}
         <div className="flex-1 min-w-[160px] self-center">
           <select
-            value={prenda}
-            onChange={(e) => cambiarPrenda(e.target.value)}
+            value={tipoId}
+            onChange={(e) => cambiarTipo(e.target.value)}
             className={inputClase}
           >
             <option value="">Seleccioná uno</option>
-            {OPCIONES_PRENDA.map((op) => (
-              <option key={op} value={op}>
-                {op}
+            {tipos.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.nombre}
               </option>
             ))}
           </select>
@@ -164,9 +163,9 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
       </div>
 
       {/* OPCIONES DINAMICAS SEGUN LA PRENDA */}
-      {reglas && (reglas.talles || reglas.color) && (
+      {tipoElegido && (tipoElegido.requiereTalle || tipoElegido.requiereColor) && (
         <div className="mt-4 flex flex-wrap gap-4">
-          {reglas.talles && (
+          {tipoElegido.requiereTalle && (
             <div className="flex-1 min-w-[140px]">
               <label className="text-xs text-purple-400 block mb-1">
                 Talle
@@ -177,7 +176,7 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
                 className={inputClase}
               >
                 <option value="">Seleccioná uno</option>
-                {reglas.talles.map((t) => (
+                {tipoElegido.tallesDisponibles.map((t) => (
                   <option key={t} value={t}>
                     {t}
                   </option>
@@ -186,7 +185,7 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
             </div>
           )}
 
-          {reglas.color && (
+          {tipoElegido.requiereColor && (
             <div className="flex-1 min-w-[140px]">
               <label className="text-xs text-purple-400 block mb-1">
                 Color
@@ -233,6 +232,16 @@ function TarjetaAlcanzada({ nivel }: { nivel: Nivel }) {
 export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
   const { nivelUsuario, personaje } = useAuth();
   const [popup, setPopup] = useState<Nivel | null>(null);
+  const [tipos, setTipos] = useState<TipoArticulo[]>([]);
+  const [cargandoTipos, setCargandoTipos] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/tipos-articulo-nivel")
+      .then((r) => r.json())
+      .then((data) => setTipos(data))
+      .catch((err) => console.error("Error al traer tipos de artículo:", err))
+      .finally(() => setCargandoTipos(false));
+  }, []);
 
   const xpActual = personaje?.xpAcumulada ?? 0;
 
@@ -302,9 +311,10 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
           </div>
         )}
 
-        {alcanzados.map((nivel) => (
-          <TarjetaAlcanzada key={nivel.uuid} nivel={nivel} />
-        ))}
+        {!cargandoTipos &&
+          alcanzados.map((nivel) => (
+            <TarjetaAlcanzada key={nivel.uuid} nivel={nivel} tipos={tipos} />
+          ))}
       </div>
 
       {/* POPUP DE NIVEL BLOQUEADO */}
