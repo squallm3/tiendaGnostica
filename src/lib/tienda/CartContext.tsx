@@ -8,6 +8,15 @@ import {
   type ReactNode,
 } from "react";
 
+export interface Personalizacion {
+  nivelId: number;
+  diseno: "a" | "b";
+  tipoArticuloId: number;
+  tipoArticuloNombre: string;
+  talle: string | null;
+  color: string | null;
+}
+
 export interface CartItem {
   id: string; // identificador unico del item en el carrito (ej: varianteId o productoId-slug)
   productoId: number;
@@ -18,6 +27,7 @@ export interface CartItem {
   talle?: string | null;
   color?: string | null;
   cantidad: number;
+  personalizacion?: Personalizacion | null;
 }
 
 interface CartContextValue {

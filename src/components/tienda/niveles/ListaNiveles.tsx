@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/tienda/AuthContext";
+import { useCart } from "@/lib/tienda/CartContext";
 
 interface Nivel {
   id: number;
@@ -22,9 +24,16 @@ interface TipoArticulo {
   requiereTalle: number;
   tallesDisponibles: string[];
   requiereColor: number;
+  precio: string;
 }
 
 const COLORES = ["Negro", "Blanco", "Rojo", "Violeta"];
+
+// Ancla tecnica: producto/variante genericos que representan cualquier
+// articulo personalizado de nivel (no tienen precio propio, el precio
+// real sale de tipos_articulo_nivel.precio).
+const PRODUCTO_GENERICO_ID = null; // no hace falta, solo se usa la variante
+const VARIANTE_GENERICA_ID = 34;
 
 // Las imagenes de nivel viejas se guardan solo con el nombre de archivo
 // (van en /tienda/niveles/xxx). Las subidas nuevas con "Explorar" ya
@@ -40,6 +49,9 @@ function TarjetaAlcanzada({
   nivel: Nivel;
   tipos: TipoArticulo[];
 }) {
+  const router = useRouter();
+  const { agregarAlCarrito } = useCart();
+
   const [seleccion, setSeleccion] = useState<"a" | "b" | null>(null);
   const [tipoId, setTipoId] = useState("");
   const [talle, setTalle] = useState("");
@@ -61,16 +73,33 @@ function TarjetaAlcanzada({
     (!tipoElegido.requiereColor || color !== "");
 
   function continuar() {
-    // Mas adelante esto avanza al checkout real (se agrega como
-    // articulo al carrito). Por ahora queda simulado.
-    console.log("Continuar con:", {
-      nivelId: nivel.id,
-      diseno: seleccion,
-      tipoArticuloId: tipoElegido?.id,
-      tipoArticuloNombre: tipoElegido?.nombre,
+    if (!tipoElegido || !seleccion) return;
+
+    const imagenElegida =
+      seleccion === "a" ? nivel.imagenA : nivel.imagenB;
+
+    const idItem = `nivel-${nivel.id}-${tipoElegido.id}-${seleccion}-${talle || "sin-talle"}-${color || "sin-color"}`;
+
+    agregarAlCarrito({
+      id: idItem,
+      productoId: 0,
+      varianteId: VARIANTE_GENERICA_ID,
+      nombre: `${tipoElegido.nombre} - Nivel ${nivel.id} (${nivel.titulo ?? ""})`,
+      precioUnitario: Number(tipoElegido.precio) || 0,
+      imagen: imagenElegida ? rutaImagenNivel(imagenElegida) : null,
       talle: talle || null,
       color: color || null,
+      personalizacion: {
+        nivelId: nivel.id,
+        diseno: seleccion,
+        tipoArticuloId: tipoElegido.id,
+        tipoArticuloNombre: tipoElegido.nombre,
+        talle: talle || null,
+        color: color || null,
+      },
     });
+
+    router.push("/tienda/carrito");
   }
 
   const inputClase =
@@ -162,7 +191,7 @@ function TarjetaAlcanzada({
             <option value="">Seleccioná uno</option>
             {tipos.map((t) => (
               <option key={t.id} value={t.id}>
-                {t.nombre}
+                {t.nombre} - ${Number(t.precio).toLocaleString("es-AR")}
               </option>
             ))}
           </select>

@@ -115,6 +115,7 @@ export async function sincronizarUsuario(token: string) {
 interface CrearPedidoPayload {
   items: {
     varianteId: number | null;
+    personalizacion?: unknown;
     cantidad: number;
     precioUnitario: number;
     nombreProducto: string;

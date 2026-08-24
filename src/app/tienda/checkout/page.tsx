@@ -36,6 +36,7 @@ function FormularioCheckout() {
       const pedido = await crearPedido(token, {
         items: items.map((item) => ({
           varianteId: item.varianteId,
+          personalizacion: item.personalizacion ?? null,
           cantidad: item.cantidad,
           precioUnitario: item.precioUnitario,
           nombreProducto: item.nombre,
@@ -122,16 +123,25 @@ function FormularioCheckout() {
         {/* Resumen */}
         <div className="border border-purple-500 rounded-xl bg-black/40 p-4 mb-8">
           {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between text-purple-200 py-1"
-            >
-              <span>
-                {item.nombre} x{item.cantidad}
-              </span>
-              <span>
-                ${(item.precioUnitario * item.cantidad).toLocaleString("es-AR")}
-              </span>
+            <div key={item.id} className="py-1">
+              <div className="flex justify-between text-purple-200">
+                <span>
+                  {item.nombre} x{item.cantidad}
+                </span>
+                <span>
+                  ${(item.precioUnitario * item.cantidad).toLocaleString("es-AR")}
+                </span>
+              </div>
+              {item.personalizacion && (
+                <p className="text-xs text-purple-500 mt-0.5">
+                  Nivel {item.personalizacion.nivelId} · Diseño{" "}
+                  {item.personalizacion.diseno.toUpperCase()}
+                  {item.personalizacion.talle &&
+                    ` · Talle ${item.personalizacion.talle}`}
+                  {item.personalizacion.color &&
+                    ` · Color ${item.personalizacion.color}`}
+                </p>
+              )}
             </div>
           ))}
           <div className="flex justify-between text-purple-100 font-bold pt-3 mt-3 border-t border-purple-500">
