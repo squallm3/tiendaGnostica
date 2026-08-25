@@ -6,10 +6,13 @@ import HeaderNav from "@/components/tienda/HeaderNav";
 import RequiereSesion from "@/components/tienda/RequiereSesion";
 import { useAuth } from "@/lib/tienda/AuthContext";
 import { useCart } from "@/lib/tienda/CartContext";
-import { crearPedido, crearPreferenciaPago } from "@/lib/api";
+import { crearPedido } from "@/lib/api";
 
 type Entrega = "envio" | "retiro";
 type MetodoPago = "mercadopago" | "efectivo";
+
+const NUMERO_WHATSAPP = "5491134126968";
+const ALIAS_TRANSFERENCIA = "mmarra.mp";
 
 function FormularioCheckout() {
   const { token, usuario } = useAuth();
@@ -24,7 +27,66 @@ function FormularioCheckout() {
   const [metodoPago, setMetodoPago] = useState<MetodoPago>("efectivo");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pedidoUuid, setPedidoUuid] = useState<string | null>(null);
+  const [pedidoConfirmado, setPedidoConfirmado] = useState<{
+    uuid: string;
+    linkWhatsApp: string;
+  } | null>(null);
+
+  function armarMensajeWhatsApp(pedidoUuid: string) {
+    const lineas: string[] = [];
+
+    lineas.push("Nuevo pedido - Haikus Gnosticos");
+    lineas.push(`Pedido: ${pedidoUuid}`);
+    lineas.push(`Cliente: ${usuario?.email ?? ""}`);
+    lineas.push("");
+    lineas.push("Productos:");
+
+    items.forEach((item) => {
+      let linea = `- ${item.nombre} x${item.cantidad} - $${(
+        item.precioUnitario * item.cantidad
+      ).toLocaleString("es-AR")}`;
+
+      if (item.personalizacion) {
+        const detalles = [];
+        detalles.push(`Nivel ${item.personalizacion.nivelId}`);
+        detalles.push(`Diseno ${item.personalizacion.diseno.toUpperCase()}`);
+        if (item.personalizacion.talle)
+          detalles.push(`Talle ${item.personalizacion.talle}`);
+        if (item.personalizacion.color)
+          detalles.push(`Color ${item.personalizacion.color}`);
+        linea += `\n   (${detalles.join(" - ")})`;
+      } else {
+        if (item.talle) linea += `\n   Talle: ${item.talle}`;
+        if (item.color) linea += `\n   Color: ${item.color}`;
+      }
+
+      lineas.push(linea);
+    });
+
+    lineas.push("");
+    lineas.push(`Total: $${total.toLocaleString("es-AR")}`);
+    lineas.push("");
+
+    if (entrega === "envio") {
+      lineas.push("Entrega: Envio");
+      lineas.push(
+        `${direccion.calle}, ${direccion.ciudad} (CP ${direccion.codigoPostal})`
+      );
+    } else {
+      lineas.push("Entrega: Retiro");
+    }
+
+    lineas.push("");
+
+    if (metodoPago === "mercadopago") {
+      lineas.push(`Pago: Transferencia a alias ${ALIAS_TRANSFERENCIA}`);
+      lineas.push("Te adjunto el comprobante de la transferencia.");
+    } else {
+      lineas.push("Pago: Efectivo al momento de la entrega/retiro");
+    }
+
+    return lineas.join("\n");
+  }
 
   async function confirmarPedido() {
     if (!token) return;
@@ -48,15 +110,15 @@ function FormularioCheckout() {
             : { tipo: "retiro" },
       });
 
-      if (metodoPago === "mercadopago") {
-        const preferencia = await crearPreferenciaPago(token, pedido.id);
-        vaciarCarrito();
-        window.location.href = preferencia.initPoint;
-        return;
-      }
+      const mensaje = armarMensajeWhatsApp(pedido.uuid);
+      const linkWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(
+        mensaje
+      )}`;
 
-      setPedidoUuid(pedido.uuid);
       vaciarCarrito();
+      setPedidoConfirmado({ uuid: pedido.uuid, linkWhatsApp });
+
+      window.open(linkWhatsApp, "_blank");
     } catch (err) {
       console.error(err);
       setError("No pudimos crear el pedido. Probá de nuevo en un momento.");
@@ -65,7 +127,7 @@ function FormularioCheckout() {
     }
   }
 
-  if (pedidoUuid) {
+  if (pedidoConfirmado) {
     return (
       <main className="min-h-screen bg-black text-white">
         <HeaderNav titulo="Pedido confirmado" />
@@ -76,12 +138,22 @@ function FormularioCheckout() {
           </h2>
           <p className="text-purple-300">
             Número de pedido:{" "}
-            <span className="text-purple-100">{pedidoUuid}</span>
+            <span className="text-purple-100">{pedidoConfirmado.uuid}</span>
           </p>
-          <p className="text-purple-300">
-            Coordinamos el pago en efectivo al momento de la entrega o el
-            retiro.
+          <p className="text-purple-300 max-w-md">
+            Te abrimos WhatsApp con el detalle de tu pedido. Si no se abrió
+            solo, tocá el botón de abajo para enviarlo vos.
           </p>
+
+          <Link
+            href={pedidoConfirmado.linkWhatsApp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-green-500 bg-green-900/30 px-6 py-3 rounded-lg text-green-300"
+          >
+            Abrir WhatsApp
+          </Link>
+
           <Link
             href="/"
             className="border border-purple-400 px-6 py-3 rounded-lg text-purple-200"
@@ -120,7 +192,6 @@ function FormularioCheckout() {
       <section className="max-w-3xl mx-auto px-6 pb-10">
         <p className="text-purple-300 mb-8">{usuario?.email}</p>
 
-        {/* Resumen */}
         <div className="border border-purple-500 rounded-xl bg-black/40 p-4 mb-8">
           {items.map((item) => (
             <div key={item.id} className="py-1">
@@ -150,7 +221,6 @@ function FormularioCheckout() {
           </div>
         </div>
 
-        {/* Entrega */}
         <div className="mb-8">
           <p className="text-purple-200 mb-3">Entrega</p>
           <div className="flex gap-3">
@@ -206,7 +276,6 @@ function FormularioCheckout() {
           )}
         </div>
 
-        {/* Pago */}
         <div className="mb-8">
           <p className="text-purple-200 mb-3">Método de pago</p>
           <div className="flex gap-3">
@@ -228,9 +297,24 @@ function FormularioCheckout() {
                   : "border-purple-400 text-purple-200"
               }`}
             >
-              Mercado Pago
+              Transferencia
             </button>
           </div>
+
+          {metodoPago === "mercadopago" && (
+            <div className="mt-4 border border-purple-600 bg-purple-950/30 rounded-lg p-4">
+              <p className="text-purple-200 text-sm">
+                Transferí el total a este alias de Mercado Pago:
+              </p>
+              <p className="text-purple-100 font-bold text-lg mt-1">
+                {ALIAS_TRANSFERENCIA}
+              </p>
+              <p className="text-purple-400 text-xs mt-2">
+                Al confirmar, se va a abrir WhatsApp con tu pedido — adjuntá
+                ahí el comprobante de la transferencia.
+              </p>
+            </div>
+          )}
         </div>
 
         {error && <p className="text-red-400 mb-4">{error}</p>}
@@ -249,11 +333,7 @@ function FormularioCheckout() {
             disabled:opacity-40
           "
         >
-          {enviando
-            ? "Procesando..."
-            : metodoPago === "mercadopago"
-            ? "PAGAR CON MERCADO PAGO"
-            : "CONFIRMAR PEDIDO"}
+          {enviando ? "Procesando..." : "CONFIRMAR PEDIDO Y ENVIAR POR WHATSAPP"}
         </button>
       </section>
     </main>
