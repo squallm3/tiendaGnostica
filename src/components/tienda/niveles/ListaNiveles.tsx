@@ -28,26 +28,74 @@ interface TipoArticulo {
 }
 
 const COLORES = ["Negro", "Blanco", "Rojo", "Violeta"];
-
-// Ancla tecnica: producto/variante genericos que representan cualquier
-// articulo personalizado de nivel (no tienen precio propio, el precio
-// real sale de tipos_articulo_nivel.precio).
-const PRODUCTO_GENERICO_ID = null; // no hace falta, solo se usa la variante
 const VARIANTE_GENERICA_ID = 34;
 
-// Las imagenes de nivel viejas se guardan solo con el nombre de archivo
-// (van en /tienda/niveles/xxx). Las subidas nuevas con "Explorar" ya
-// vienen con la ruta completa (/uploads/productos/xxx).
 function rutaImagenNivel(valor: string) {
   return valor.startsWith("/uploads") ? valor : `/tienda/niveles/${valor}`;
+}
+
+function MiniaturaConLupa({
+  src,
+  alt,
+  seleccionada,
+  onSeleccionar,
+  onAmpliar,
+  seleccionable,
+}: {
+  src: string;
+  alt: string;
+  seleccionada?: boolean;
+  onSeleccionar?: () => void;
+  onAmpliar: () => void;
+  seleccionable: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div
+        className={`relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 transition ${
+          seleccionada ? "border-purple-300" : "border-purple-700"
+        }`}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover cursor-zoom-in"
+          onClick={onAmpliar}
+        />
+
+        {seleccionada && (
+          <span className="absolute top-1 right-1 bg-purple-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center z-10 pointer-events-none">
+            ✓
+          </span>
+        )}
+      </div>
+
+      {seleccionable && (
+        <button
+          type="button"
+          onClick={onSeleccionar}
+          className={`text-xs px-2 py-1 rounded-lg border ${
+            seleccionada
+              ? "border-purple-300 text-purple-100 bg-purple-900/50"
+              : "border-purple-600 text-purple-300"
+          }`}
+        >
+          {seleccionada ? "Seleccionada" : "Seleccionar"}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function TarjetaAlcanzada({
   nivel,
   tipos,
+  onAmpliar,
 }: {
   nivel: Nivel;
   tipos: TipoArticulo[];
+  onAmpliar: (src: string, alt: string) => void;
 }) {
   const router = useRouter();
   const { agregarAlCarrito } = useCart();
@@ -61,7 +109,6 @@ function TarjetaAlcanzada({
 
   function cambiarTipo(valor: string) {
     setTipoId(valor);
-    // Al cambiar de prenda, se resetean las opciones anteriores
     setTalle("");
     setColor("");
   }
@@ -75,8 +122,7 @@ function TarjetaAlcanzada({
   function continuar() {
     if (!tipoElegido || !seleccion) return;
 
-    const imagenElegida =
-      seleccion === "a" ? nivel.imagenA : nivel.imagenB;
+    const imagenElegida = seleccion === "a" ? nivel.imagenA : nivel.imagenB;
 
     const idItem = `nivel-${nivel.id}-${tipoElegido.id}-${seleccion}-${talle || "sin-talle"}-${color || "sin-color"}`;
 
@@ -120,68 +166,57 @@ function TarjetaAlcanzada({
       </div>
 
       <div className="flex flex-wrap items-start justify-center gap-4">
-        {/* IMAGEN A */}
         {nivel.imagenA && (
-          <button
-            type="button"
-            onClick={() => setSeleccion("a")}
-            className={`relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 transition ${
-              seleccion === "a" ? "border-purple-300" : "border-purple-700"
-            }`}
-          >
-            <Image
-              src={rutaImagenNivel(nivel.imagenA)}
-              alt={`${nivel.titulo ?? "Nivel"} - diseño A`}
-              fill
-              className="object-cover"
-            />
-            {seleccion === "a" && (
-              <span className="absolute top-1 right-1 bg-purple-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                ✓
-              </span>
-            )}
-          </button>
+          <MiniaturaConLupa
+            src={rutaImagenNivel(nivel.imagenA)}
+            alt={`${nivel.titulo ?? "Nivel"} - diseño A`}
+            seleccionable
+            seleccionada={seleccion === "a"}
+            onSeleccionar={() => setSeleccion("a")}
+            onAmpliar={() =>
+              onAmpliar(
+                rutaImagenNivel(nivel.imagenA!),
+                `${nivel.titulo ?? "Nivel"} - diseño A`
+              )
+            }
+          />
         )}
 
-        {/* IMAGEN B */}
         {nivel.imagenB && (
-          <button
-            type="button"
-            onClick={() => setSeleccion("b")}
-            className={`relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 transition ${
-              seleccion === "b" ? "border-purple-300" : "border-purple-700"
-            }`}
-          >
-            <Image
-              src={rutaImagenNivel(nivel.imagenB)}
-              alt={`${nivel.titulo ?? "Nivel"} - diseño B`}
-              fill
-              className="object-cover"
-            />
-            {seleccion === "b" && (
-              <span className="absolute top-1 right-1 bg-purple-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                ✓
-              </span>
-            )}
-          </button>
+          <MiniaturaConLupa
+            src={rutaImagenNivel(nivel.imagenB)}
+            alt={`${nivel.titulo ?? "Nivel"} - diseño B`}
+            seleccionable
+            seleccionada={seleccion === "b"}
+            onSeleccionar={() => setSeleccion("b")}
+            onAmpliar={() =>
+              onAmpliar(
+                rutaImagenNivel(nivel.imagenB!),
+                `${nivel.titulo ?? "Nivel"} - diseño B`
+              )
+            }
+          />
         )}
 
-        {/* IMAGEN 3D (solo vista, no seleccionable) */}
         {nivel.imagenA3d && (
-          <div className="relative w-24 sm:w-28 aspect-[4/5] shrink-0 rounded-lg overflow-hidden border-2 border-purple-800">
-            <Image
+          <div className="relative">
+            <MiniaturaConLupa
               src={rutaImagenNivel(nivel.imagenA3d)}
               alt={`${nivel.titulo ?? "Nivel"} - vista 3D`}
-              fill
-              className="object-cover"
+              seleccionable={false}
+              onAmpliar={() =>
+                onAmpliar(
+                  rutaImagenNivel(nivel.imagenA3d!),
+                  `${nivel.titulo ?? "Nivel"} - vista 3D`
+                )
+              }
             />
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] bg-black/70 text-purple-300 px-1.5 py-0.5 rounded">
+            <span className="absolute top-1 right-1 text-[9px] bg-black/70 text-purple-300 px-1.5 py-0.5 rounded z-10 pointer-events-none">
               3D
             </span>
           </div>
         )}
 
-        {/* DROPDOWN DE PRENDA, en la misma fila */}
         <div className="flex-1 min-w-[160px] self-center">
           <select
             value={tipoId}
@@ -198,7 +233,6 @@ function TarjetaAlcanzada({
         </div>
       </div>
 
-      {/* OPCIONES DINAMICAS SEGUN LA PRENDA */}
       {tipoElegido && (tipoElegido.requiereTalle || tipoElegido.requiereColor) && (
         <div className="mt-4 flex flex-wrap gap-4">
           {tipoElegido.requiereTalle && (
@@ -270,6 +304,10 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
   const [popup, setPopup] = useState<Nivel | null>(null);
   const [tipos, setTipos] = useState<TipoArticulo[]>([]);
   const [cargandoTipos, setCargandoTipos] = useState(true);
+  const [imagenAmpliada, setImagenAmpliada] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
 
   useEffect(() => {
     fetch("/api/tipos-articulo-nivel")
@@ -349,7 +387,12 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
 
         {!cargandoTipos &&
           alcanzados.map((nivel) => (
-            <TarjetaAlcanzada key={nivel.uuid} nivel={nivel} tipos={tipos} />
+            <TarjetaAlcanzada
+              key={nivel.uuid}
+              nivel={nivel}
+              tipos={tipos}
+              onAmpliar={(src, alt) => setImagenAmpliada({ src, alt })}
+            />
           ))}
       </div>
 
@@ -386,6 +429,33 @@ export default function ListaNiveles({ niveles }: { niveles: Nivel[] }) {
               Cerrar
             </button>
           </div>
+        </div>
+      )}
+
+      {/* MODAL DE IMAGEN AMPLIADA */}
+      {imagenAmpliada && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/85 flex items-center justify-center p-6"
+          onClick={() => setImagenAmpliada(null)}
+        >
+          <div
+            className="relative w-full max-w-md aspect-[4/5]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={imagenAmpliada.src}
+              alt={imagenAmpliada.alt}
+              fill
+              className="object-contain"
+            />
+          </div>
+
+          <button
+            onClick={() => setImagenAmpliada(null)}
+            className="fixed top-6 right-6 border border-purple-400 w-10 h-10 rounded-full text-purple-200 text-xl"
+          >
+            ✕
+          </button>
         </div>
       )}
     </>
